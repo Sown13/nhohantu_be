@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: tc-book-be
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      #      better use this ddl-auto: update than create-drop or create since it might be lost data
+      ddl-auto: update
+    show-sql: true
+  jwt:
+    secret: ${JWT_SECRET}
+    expire: ${JWT_EXPIRE}
+    refresh: ${JWT_SECRET_REFRESH}
+    expire-refrest: ${JWT_EXPIRE_REFRESH}
+server:
+  port: ${PORT}
+  servlet:
+    context-path: /api/v1
