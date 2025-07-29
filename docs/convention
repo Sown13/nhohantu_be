@@ -1,0 +1,13 @@
+Dành cho dev
+1/ Naming Convention
+- entity: kết thúc với hậu tố Model
+- DTO: kết thúc với hậu tố Model
+- Service: kết thúc với hậu tố Service
+- Repository: kết thúc với hậu tố Repo
+- Boolean:
+  - Là 1 trường của entity: không đặt tên bắt đầu với is (tránh lỗi lombok)
+  - Là 1 biến thông thường: bắt buộc đặt tên bắt đầu với is/has
+
+2/ Quy ước chung
+- Luôn luôn chia page nếu query lấy list
+- Page bắt đầu từ 1

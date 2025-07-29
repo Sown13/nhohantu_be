@@ -46,6 +46,6 @@ public class UserBasicInfoModel extends BaseEntity {
     @Column(name = "created_by", columnDefinition = "INT")
     private Long createdBy;
 
-    @Column(name = "description")
-    private String description;
+    @Column(name = "address")
+    private String address;
 }

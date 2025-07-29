@@ -1,10 +1,11 @@
 package com.nhohantu.tcbookbe.model.dto.request;
 
-import com.nhohantu.tcbookbe.annotation.IsValidCMSRole;
+import com.nhohantu.tcbookbe.annotation.IsValidRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -33,11 +34,11 @@ public class RegisterRequest {
     private String email;
 
     @Size(max = 2000)
-    private String description;
+    private String address;
 
     @Size(min = 9, max = 13)
     private String phone;
 
-    @IsValidCMSRole
-    private String role;
+    @IsValidRole
+    private String role = "BASIC_USER";
 }

@@ -16,7 +16,12 @@ spring:
     expire: ${JWT_EXPIRE}
     refresh: ${JWT_SECRET_REFRESH}
     expire-refrest: ${JWT_EXPIRE_REFRESH}
+
+  devtools:
+    restart:
+      enabled: false
 server:
   port: ${PORT}
   servlet:
     context-path: /api/v1
+

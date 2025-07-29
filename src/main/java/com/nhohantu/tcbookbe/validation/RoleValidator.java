@@ -1,6 +1,6 @@
 package com.nhohantu.tcbookbe.validation;
 
-import com.nhohantu.tcbookbe.annotation.IsValidCMSRole;
+import com.nhohantu.tcbookbe.annotation.IsValidRole;
 import com.nhohantu.tcbookbe.model.entity.UserBasicInfoModel;
 import com.nhohantu.tcbookbe.model.enums.RoleEnum;
 import com.nhohantu.tcbookbe.service.UserBasicInfoService;
@@ -9,7 +9,7 @@ import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class RoleValidator implements ConstraintValidator<IsValidCMSRole, String> {
+public class RoleValidator implements ConstraintValidator<IsValidRole, String> {
     private final UserBasicInfoService userBasicInfoService;
 
     @Override
@@ -21,21 +21,21 @@ public class RoleValidator implements ConstraintValidator<IsValidCMSRole, String
             return false;
         }
 
-        UserBasicInfoModel userInfo;
-        try {
-            userInfo = userBasicInfoService.getUserInfoFromContext();
-            if (userInfo == null) {
-                constraintValidatorContext.disableDefaultConstraintViolation();
-                constraintValidatorContext.buildConstraintViolationWithTemplate("Error validate, can't get user info from context")
-                        .addConstraintViolation();
-                return false;
-            }
-        } catch (Exception e) {
-            constraintValidatorContext.disableDefaultConstraintViolation();
-            constraintValidatorContext.buildConstraintViolationWithTemplate("Error validate when get user info from context")
-                    .addConstraintViolation();
-            return false;
-        }
+//        UserBasicInfoModel userInfo;
+//        try {
+//            userInfo = userBasicInfoService.getUserInfoFromContext();
+//            if (userInfo == null) {
+//                constraintValidatorContext.disableDefaultConstraintViolation();
+//                constraintValidatorContext.buildConstraintViolationWithTemplate("Error validate, can't get user info from context")
+//                        .addConstraintViolation();
+//                return false;
+//            }
+//        } catch (Exception e) {
+//            constraintValidatorContext.disableDefaultConstraintViolation();
+//            constraintValidatorContext.buildConstraintViolationWithTemplate("Error validate when get user info from context")
+//                    .addConstraintViolation();
+//            return false;
+//        }
 
         if (requestRole.equals(RoleEnum.ROOT)) {
             constraintValidatorContext.disableDefaultConstraintViolation();
@@ -44,9 +44,9 @@ public class RoleValidator implements ConstraintValidator<IsValidCMSRole, String
             return false;
         }
 
-        if (userInfo.getRole().equals(RoleEnum.ROOT) || userInfo.getRole().equals(RoleEnum.ADMIN)) {
-            return true;
-        }
+//        if (userInfo.getRole().equals(RoleEnum.ROOT) || userInfo.getRole().equals(RoleEnum.ADMIN)) {
+//            return true;
+//        }
 
         constraintValidatorContext.disableDefaultConstraintViolation();
         constraintValidatorContext.buildConstraintViolationWithTemplate("You do not have permission for creating account with this ROLE").addConstraintViolation();
@@ -54,7 +54,7 @@ public class RoleValidator implements ConstraintValidator<IsValidCMSRole, String
     }
 
     @Override
-    public void initialize(IsValidCMSRole constraintAnnotation) {
+    public void initialize(IsValidRole constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
     }
 

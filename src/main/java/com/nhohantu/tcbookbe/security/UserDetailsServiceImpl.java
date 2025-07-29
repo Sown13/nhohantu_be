@@ -1,7 +1,7 @@
 package com.nhohantu.tcbookbe.security;
 
 import com.nhohantu.tcbookbe.model.entity.UserBasicInfoModel;
-import com.nhohantu.tcbookbe.repository.IUserInfoRepository;
+import com.nhohantu.tcbookbe.repository.IUserInfoRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,7 +13,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
-    private final IUserInfoRepository userInfoRepository;
+    private final IUserInfoRepo userInfoRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

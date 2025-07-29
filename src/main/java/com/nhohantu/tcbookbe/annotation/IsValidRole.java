@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = RoleValidator.class)
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface IsValidCMSRole {
+public @interface IsValidRole {
     String message() default "Invalid ROLE";
 
     Class<?>[] groups() default {};

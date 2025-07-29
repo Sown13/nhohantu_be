@@ -8,7 +8,7 @@ import com.nhohantu.tcbookbe.model.dto.response.LoginResponse;
 import com.nhohantu.tcbookbe.model.entity.UserBasicInfoModel;
 import com.nhohantu.tcbookbe.model.enums.RoleEnum;
 import com.nhohantu.tcbookbe.model.enums.StatusCodeEnum;
-import com.nhohantu.tcbookbe.repository.IUserInfoRepository;
+import com.nhohantu.tcbookbe.repository.IUserInfoRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-    private final IUserInfoRepository userRepository;
+    private final IUserInfoRepo userRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -34,7 +34,7 @@ public class AuthenticationService {
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .role(RoleEnum.valueOf(request.getRole()))
-                .description(request.getDescription())
+                .address(request.getAddress())
                 .email(request.getEmail())
                 .primaryPhone(request.getPhone())
                 .createdBy(userBasicInfoModel.getId())
