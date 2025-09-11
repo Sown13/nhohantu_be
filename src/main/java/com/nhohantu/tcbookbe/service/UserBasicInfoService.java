@@ -48,19 +48,19 @@ public class UserBasicInfoService {
                         StatusCodeEnum.ERRORCODE4000);
             }
 
-            UserBasicInfoModel userBasicInfoModel;
-            try {
-                userBasicInfoModel = getUserInfoFromContext();
-                if (userBasicInfoModel == null) {
-                    return ResponseBuilder.badRequestResponse("Create new user failed, can not get user info from context",
-                            StatusCodeEnum.ERRORCODE4000);
-                }
-            } catch (Exception e) {
-                return ResponseBuilder.badRequestResponse("Create new user failed, error when get user info from context",
-                        StatusCodeEnum.ERRORCODE4000);
-            }
+//            UserBasicInfoModel userBasicInfoModel;
+//            try {
+//                userBasicInfoModel = getUserInfoFromContext();
+//                if (userBasicInfoModel == null) {
+//                    return ResponseBuilder.badRequestResponse("Create new user failed, can not get user info from context",
+//                            StatusCodeEnum.ERRORCODE4000);
+//                }
+//            } catch (Exception e) {
+//                return ResponseBuilder.badRequestResponse("Create new user failed, error when get user info from context",
+//                        StatusCodeEnum.ERRORCODE4000);
+//            }
 
-            registeredUser = authService.signup(request, userBasicInfoModel);
+            registeredUser = authService.signup(request, null);
         } catch (Exception e) {
             return ResponseBuilder.badRequestResponse("Create new user failed, unexpected error",
                     StatusCodeEnum.ERRORCODE4000);
