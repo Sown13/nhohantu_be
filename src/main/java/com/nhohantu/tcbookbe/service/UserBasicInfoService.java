@@ -1,10 +1,10 @@
 package com.nhohantu.tcbookbe.service;
 
 import com.nhohantu.tcbookbe.model.builder.ResponseBuilder;
-import com.nhohantu.tcbookbe.model.builder.ResponseDto;
+import com.nhohantu.tcbookbe.model.builder.ResponseDTO;
 import com.nhohantu.tcbookbe.model.dto.request.RegisterRequest;
 import com.nhohantu.tcbookbe.model.dto.response.RegisterResponse;
-import com.nhohantu.tcbookbe.model.entity.UserBasicInfoModel;
+import com.nhohantu.tcbookbe.model.entity.system.UserBasicInfoModel;
 import com.nhohantu.tcbookbe.model.enums.StatusCodeEnum;
 import com.nhohantu.tcbookbe.security.AuthenticationService;
 import com.nhohantu.tcbookbe.security.UserDetailsImpl;
@@ -39,7 +39,7 @@ public class UserBasicInfoService {
         }
     }
 
-    public ResponseEntity<ResponseDto<RegisterResponse>> register(@RequestBody @Valid RegisterRequest request) {
+    public ResponseEntity<ResponseDTO<RegisterResponse>> register(@RequestBody @Valid RegisterRequest request) {
         UserDetailsImpl registeredUser;
         try {
             UserDetails usernameExist = userDetailsService.loadUserByUsername(request.getUsername());

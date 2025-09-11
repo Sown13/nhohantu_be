@@ -1,4 +1,4 @@
-package com.nhohantu.tcbookbe.model.base;
+package com.nhohantu.tcbookbe.model.base.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

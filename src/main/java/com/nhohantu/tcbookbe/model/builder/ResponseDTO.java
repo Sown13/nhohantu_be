@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResponseDto<T> {
+public class ResponseDTO<T> {
     private boolean success;
     private String message;
     private T data;

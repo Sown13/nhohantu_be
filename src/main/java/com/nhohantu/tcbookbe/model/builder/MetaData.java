@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**Start page = 0,
+ * Default size = 10*/
 @Data
 @Builder
 @AllArgsConstructor

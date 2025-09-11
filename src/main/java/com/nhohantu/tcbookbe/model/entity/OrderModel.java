@@ -1,6 +1,6 @@
 package com.nhohantu.tcbookbe.model.entity;
 
-import com.nhohantu.tcbookbe.model.base.BaseEntity;
+import com.nhohantu.tcbookbe.model.base.entity.BaseModel;
 
-public class OrderModel extends BaseEntity {
+public class OrderModel extends BaseModel {
 }

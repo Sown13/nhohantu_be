@@ -1,6 +1,6 @@
 package com.nhohantu.tcbookbe.security;
 
-import com.nhohantu.tcbookbe.model.entity.UserBasicInfoModel;
+import com.nhohantu.tcbookbe.model.entity.system.UserBasicInfoModel;
 import com.nhohantu.tcbookbe.repository.IUserInfoRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,7 +25,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return null;
     }
 
-    public UserDetails loadUserById(Integer id) throws UsernameNotFoundException {
+    public UserDetails loadUserById(Long id) throws UsernameNotFoundException {
         Optional<UserBasicInfoModel> userBasicInfo = userInfoRepository.findById(id);
         if (userBasicInfo.isPresent()) {
             return new UserDetailsImpl(userBasicInfo.get());

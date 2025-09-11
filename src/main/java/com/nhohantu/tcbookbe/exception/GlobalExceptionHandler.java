@@ -1,7 +1,7 @@
 package com.nhohantu.tcbookbe.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nhohantu.tcbookbe.model.builder.ResponseDto;
+import com.nhohantu.tcbookbe.model.builder.ResponseDTO;
 import com.nhohantu.tcbookbe.model.dto.response.ExceptionMessageResponse;
 import com.nhohantu.tcbookbe.model.enums.StatusCodeEnum;
 import jakarta.validation.ConstraintViolationException;
@@ -30,8 +30,8 @@ public class GlobalExceptionHandler {
     private final ObjectMapper objectMapper;
 
     @ExceptionHandler(NotFoundException.class)
-    public <T> ResponseEntity<ResponseDto<T>> errorResponse(NotFoundException ex, Locale locale) {
-        final ResponseDto<T> dto = ResponseDto.<T>
+    public <T> ResponseEntity<ResponseDTO<T>> errorResponse(NotFoundException ex, Locale locale) {
+        final ResponseDTO<T> dto = ResponseDTO.<T>
                         builder()
                 .success(false)
                 .message(ex.getMessage())
@@ -41,8 +41,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public <T> ResponseEntity<ResponseDto<T>> httpMessageNotReadableException(HttpMessageNotReadableException ex, Locale locale) {
-        final ResponseDto<T> dto = ResponseDto.<T>
+    public <T> ResponseEntity<ResponseDTO<T>> httpMessageNotReadableException(HttpMessageNotReadableException ex, Locale locale) {
+        final ResponseDTO<T> dto = ResponseDTO.<T>
                         builder()
                 .success(false)
                 .message(ex.getMessage())
@@ -52,8 +52,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public <T> ResponseEntity<ResponseDto<T>> missingServletRequestParameterException(MissingServletRequestParameterException ex, Locale locale) {
-        final ResponseDto<T> dto = ResponseDto.<T>
+    public <T> ResponseEntity<ResponseDTO<T>> missingServletRequestParameterException(MissingServletRequestParameterException ex, Locale locale) {
+        final ResponseDTO<T> dto = ResponseDTO.<T>
                         builder()
                 .success(false)
                 .message(ex.getMessage())
@@ -63,8 +63,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadRequestException.class)
-    public <T> ResponseEntity<ResponseDto<T>> badRequest(BadRequestException ex, Locale locale) {
-        final ResponseDto<T> dto = ResponseDto.<T>
+    public <T> ResponseEntity<ResponseDTO<T>> badRequest(BadRequestException ex, Locale locale) {
+        final ResponseDTO<T> dto = ResponseDTO.<T>
                         builder()
                 .success(false)
                 .message(ex.getMessage())
@@ -74,8 +74,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public <T> ResponseEntity<ResponseDto<T>> exception(Exception ex, Locale locale) {
-        final ResponseDto<T> dto = ResponseDto.<T>
+    public <T> ResponseEntity<ResponseDTO<T>> exception(Exception ex, Locale locale) {
+        final ResponseDTO<T> dto = ResponseDTO.<T>
                         builder()
                 .success(false)
                 .message(ex.getMessage())
@@ -85,7 +85,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public static ResponseEntity<ResponseDto<List<ExceptionMessageResponse>>> handleValidationExceptions(MethodArgumentNotValidException ex, Locale locale) {
+    public static ResponseEntity<ResponseDTO<List<ExceptionMessageResponse>>> handleValidationExceptions(MethodArgumentNotValidException ex, Locale locale) {
 
         List<ExceptionMessageResponse> data = new ArrayList<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
@@ -99,7 +99,7 @@ public class GlobalExceptionHandler {
             message = data.get(0).getMessage();
         }
 
-        final ResponseDto<List<ExceptionMessageResponse>> dto = ResponseDto.<List<ExceptionMessageResponse>>
+        final ResponseDTO<List<ExceptionMessageResponse>> dto = ResponseDTO.<List<ExceptionMessageResponse>>
                         builder()
                 .success(false)
                 .data(data)
@@ -110,7 +110,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public static ResponseEntity<ResponseDto<List<ExceptionMessageResponse>>> handleValidationExceptions(ConstraintViolationException ex, Locale locale) {
+    public static ResponseEntity<ResponseDTO<List<ExceptionMessageResponse>>> handleValidationExceptions(ConstraintViolationException ex, Locale locale) {
 
         List<ExceptionMessageResponse> data = ex.getConstraintViolations().stream().map(cv -> {
             Path.Node lastNode = null;
@@ -127,7 +127,7 @@ public class GlobalExceptionHandler {
             message = data.get(0).getMessage();
         }
 
-        final ResponseDto<List<ExceptionMessageResponse>> dto = ResponseDto.<List<ExceptionMessageResponse>>
+        final ResponseDTO<List<ExceptionMessageResponse>> dto = ResponseDTO.<List<ExceptionMessageResponse>>
                         builder()
                 .success(false)
                 .data(data)
@@ -138,8 +138,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public <T> ResponseEntity<ResponseDto<T>> deniedExecuted(AccessDeniedException ex, Locale locale) {
-        final ResponseDto<T> dto = ResponseDto.<T>
+    public <T> ResponseEntity<ResponseDTO<T>> deniedExecuted(AccessDeniedException ex, Locale locale) {
+        final ResponseDTO<T> dto = ResponseDTO.<T>
                         builder()
                 .success(false)
                 .message(ex.getMessage())
@@ -149,8 +149,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UserDoesNotHavePermission.class)
-    public <T> ResponseEntity<ResponseDto<T>> userDoesNotHavePermission(UserDoesNotHavePermission ex, Locale locale) {
-        final ResponseDto<T> dto = ResponseDto.<T>
+    public <T> ResponseEntity<ResponseDTO<T>> userDoesNotHavePermission(UserDoesNotHavePermission ex, Locale locale) {
+        final ResponseDTO<T> dto = ResponseDTO.<T>
                         builder()
                 .success(false)
                 .message(ex.getMessage())
@@ -160,8 +160,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpClientErrorException.Forbidden.class)
-    public <T> ResponseEntity<ResponseDto<T>> userDoesNotHaveAuthority(UserDoesNotHavePermission ex, Locale locale) {
-        final ResponseDto<T> dto = ResponseDto.<T>
+    public <T> ResponseEntity<ResponseDTO<T>> userDoesNotHaveAuthority(UserDoesNotHavePermission ex, Locale locale) {
+        final ResponseDTO<T> dto = ResponseDTO.<T>
                         builder()
                 .success(false)
                 .message(ex.getMessage())

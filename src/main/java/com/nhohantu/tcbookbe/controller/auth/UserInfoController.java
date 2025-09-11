@@ -1,6 +1,6 @@
 package com.nhohantu.tcbookbe.controller.auth;
 
-import com.nhohantu.tcbookbe.model.builder.ResponseDto;
+import com.nhohantu.tcbookbe.model.builder.ResponseDTO;
 import com.nhohantu.tcbookbe.model.dto.request.RegisterRequest;
 import com.nhohantu.tcbookbe.model.dto.response.RegisterResponse;
 import com.nhohantu.tcbookbe.service.UserBasicInfoService;
@@ -23,7 +23,7 @@ public class UserInfoController {
             description = "Registry"
     )
     @PostMapping("/create-user")
-    public ResponseEntity<ResponseDto<RegisterResponse>> register(@RequestBody @Valid RegisterRequest request) {
+    public ResponseEntity<ResponseDTO<RegisterResponse>> register(@RequestBody @Valid RegisterRequest request) {
         return userCmsInfoService.register(request);
     }
 }

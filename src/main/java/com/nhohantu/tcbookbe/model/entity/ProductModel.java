@@ -1,11 +1,10 @@
 package com.nhohantu.tcbookbe.model.entity;
 
-import com.nhohantu.tcbookbe.model.base.BaseEntity;
+import com.nhohantu.tcbookbe.model.base.entity.BaseModel;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +20,7 @@ import java.math.BigDecimal;
 @Builder
 @Table(name = "product")
 @Entity
-public class ProductModel extends BaseEntity {
+public class ProductModel extends BaseModel {
     @Column(name = "name", columnDefinition = "VARCHAR(500)", nullable = false)
     private String name;//tên sp
 

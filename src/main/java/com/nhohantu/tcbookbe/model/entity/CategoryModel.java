@@ -1,6 +1,6 @@
 package com.nhohantu.tcbookbe.model.entity;
 
-import com.nhohantu.tcbookbe.model.base.BaseEntity;
+import com.nhohantu.tcbookbe.model.base.entity.BaseModel;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -23,7 +23,7 @@ import java.util.List;
 @Builder
 @Table(name = "category")
 @Entity
-public class CategoryModel extends BaseEntity {
+public class CategoryModel extends BaseModel {
     @Column(name = "name", columnDefinition = "VARCHAR(255)", nullable = false)
     private String name;//tên danh mục
 

@@ -1,11 +1,11 @@
 package com.nhohantu.tcbookbe.security;
 
 import com.nhohantu.tcbookbe.model.builder.ResponseBuilder;
-import com.nhohantu.tcbookbe.model.builder.ResponseDto;
+import com.nhohantu.tcbookbe.model.builder.ResponseDTO;
 import com.nhohantu.tcbookbe.model.dto.request.LoginRequest;
 import com.nhohantu.tcbookbe.model.dto.request.RegisterRequest;
 import com.nhohantu.tcbookbe.model.dto.response.LoginResponse;
-import com.nhohantu.tcbookbe.model.entity.UserBasicInfoModel;
+import com.nhohantu.tcbookbe.model.entity.system.UserBasicInfoModel;
 import com.nhohantu.tcbookbe.model.enums.RoleEnum;
 import com.nhohantu.tcbookbe.model.enums.StatusCodeEnum;
 import com.nhohantu.tcbookbe.repository.IUserInfoRepo;
@@ -33,7 +33,7 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
-                .role(RoleEnum.valueOf(request.getRole()))
+//                .role(RoleEnum.valueOf(request.getRole()))
                 .address(request.getAddress())
                 .email(request.getEmail())
                 .primaryPhone(request.getPhone())
@@ -55,7 +55,7 @@ public class AuthenticationService {
                 .orElseThrow());
     }
 
-    public ResponseEntity<ResponseDto<LoginResponse>> requestLogin(LoginRequest request) {
+    public ResponseEntity<ResponseDTO<LoginResponse>> requestLogin(LoginRequest request) {
         UserDetailsImpl authenticatedUser;
         try {
             authenticatedUser = authenticate(request);

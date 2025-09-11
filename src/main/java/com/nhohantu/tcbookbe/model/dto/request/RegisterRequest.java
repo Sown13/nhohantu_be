@@ -39,6 +39,6 @@ public class RegisterRequest {
     @Size(min = 9, max = 13)
     private String phone;
 
-    @IsValidRole
-    private String role = "BASIC_USER";
+//    @IsValidRole
+//    private String role = "BASIC_USER";
 }

@@ -1,7 +1,6 @@
 package com.nhohantu.tcbookbe.validation;
 
 import com.nhohantu.tcbookbe.annotation.IsValidRole;
-import com.nhohantu.tcbookbe.model.entity.UserBasicInfoModel;
 import com.nhohantu.tcbookbe.model.enums.RoleEnum;
 import com.nhohantu.tcbookbe.service.UserBasicInfoService;
 import jakarta.validation.ConstraintValidator;

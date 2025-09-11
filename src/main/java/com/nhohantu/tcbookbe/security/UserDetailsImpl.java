@@ -1,6 +1,6 @@
 package com.nhohantu.tcbookbe.security;
 
-import com.nhohantu.tcbookbe.model.entity.UserBasicInfoModel;
+import com.nhohantu.tcbookbe.model.entity.system.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,18 +9,36 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDetailsImpl implements UserDetails {
-    UserBasicInfoModel user;
+    private UserBasicInfoModel user;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         String ROLE_PREFIX = "ROLE_";
-        return List.of(new SimpleGrantedAuthority(ROLE_PREFIX + user.getRole()));
+        String PERM_PREFIX = "PERM_";
+        return user.getUserRoles().stream()
+                .flatMap(userRole -> {
+                    SysRoleModel role = userRole.getRole();
+
+                    // Gộp ROLE + PERMISSION
+                    Stream<GrantedAuthority> roleAuthorities = Stream.of(
+                            new SimpleGrantedAuthority(ROLE_PREFIX + role.getRoleName())
+                    );
+
+                    Stream<GrantedAuthority> permissionAuthorities = role.getRolePermissions().stream()
+                            .map(RolePermissionModel::getPermission)
+                            .map(SysPermissionModel::getPermissionName)
+                            .map(permName -> new SimpleGrantedAuthority(PERM_PREFIX + permName));
+
+                    return Stream.concat(roleAuthorities, permissionAuthorities);
+                })
+                .collect(Collectors.toSet()); // dùng Set để tránh trùng lặp
     }
 
     @Override

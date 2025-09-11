@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -41,7 +42,21 @@ public class JwtService {
 
     public String generateToken(UserDetailsImpl userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", userDetails.getUser().getRole());
+
+        // Lấy danh sách role name
+        List<String> roles = userDetails.getUser().getUserRoles().stream()
+                .map(userRole -> userRole.getRole().getRoleName())
+                .toList();
+
+        // Lấy danh sách permission
+        List<String> permissions = userDetails.getUser().getUserRoles().stream()
+                .flatMap(userRole -> userRole.getRole().getRolePermissions().stream())
+                .map(rp -> rp.getPermission().getPermissionName())
+                .distinct()
+                .toList();
+
+        claims.put("roles", roles);
+        claims.put("permissions", permissions);
         claims.put("username", userDetails.getUsername());
         return generateToken(claims, userDetails);
     }

@@ -1,17 +1,15 @@
-package com.nhohantu.tcbookbe.model.entity;
+package com.nhohantu.tcbookbe.model.entity.system;
 
-import com.nhohantu.tcbookbe.model.base.BaseEntity;
-import com.nhohantu.tcbookbe.model.enums.RoleEnum;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
+import com.nhohantu.tcbookbe.model.base.entity.BaseModel;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @EqualsAndHashCode(callSuper = false)
 @Data
@@ -20,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Table(name = "user_basic_info")
 @Entity
-public class UserBasicInfoModel extends BaseEntity {
+public class UserBasicInfoModel extends BaseModel {
     @Column(name = "username", columnDefinition = "VARCHAR(50)", unique = true, nullable = false)
     private String username;
 
@@ -39,13 +37,16 @@ public class UserBasicInfoModel extends BaseEntity {
     @Column(name = "email", columnDefinition = "VARCHAR(255)")
     private String email;
 
-    @Column(name = "role", columnDefinition = "VARCHAR(50)")
-    @Enumerated(EnumType.STRING)
-    private RoleEnum role;
+//    @Column(name = "role", columnDefinition = "VARCHAR(50)")
+//    @Enumerated(EnumType.STRING)
+//    private RoleEnum role;
 
     @Column(name = "created_by", columnDefinition = "INT")
     private Long createdBy;
 
     @Column(name = "address")
     private String address;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    private Set<UserSysRoleModel> userRoles = new HashSet<>();
 }
