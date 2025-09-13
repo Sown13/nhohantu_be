@@ -17,6 +17,10 @@ import java.util.List;
 @Table(name = "product")
 @Entity
 public class ProductModel extends BaseModel {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @Column(name = "name", columnDefinition = "VARCHAR(500)", nullable = false)
     private String name;//tên sp
 
