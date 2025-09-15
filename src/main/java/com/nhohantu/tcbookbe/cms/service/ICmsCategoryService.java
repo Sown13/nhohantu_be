@@ -1,4 +1,8 @@
 package com.nhohantu.tcbookbe.cms.service;
 
-public interface ICmsCategoryService {
+import com.nhohantu.tcbookbe.common.repository.BaseCategoryRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface ICmsCategoryService extends BaseCategoryRepository {
 }
