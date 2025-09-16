@@ -2,7 +2,7 @@ package com.nhohantu.tcbookbe.cms.controller;
 
 import com.nhohantu.tcbookbe.cms.dto.request.CmsCreateCategoryRequest;
 import com.nhohantu.tcbookbe.cms.dto.response.CmsCreateCategoryResponse;
-import com.nhohantu.tcbookbe.cms.service.implement.CmsCategoryService;
+import com.nhohantu.tcbookbe.cms.service.CmsCategoryService;
 import com.nhohantu.tcbookbe.common.model.builder.ResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
