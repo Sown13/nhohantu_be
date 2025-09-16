@@ -1,10 +1,10 @@
-package com.nhohantu.tcbookbe.cms.service.implement;
+package com.nhohantu.tcbookbe.cms.service;
 
 import com.nhohantu.tcbookbe.cms.dto.request.CmsCreateProductRequest;
 import com.nhohantu.tcbookbe.cms.dto.response.CmsCreateProductResponse;
 import com.nhohantu.tcbookbe.cms.repository.ICmsCategoryRepository;
 import com.nhohantu.tcbookbe.cms.repository.ICmsProductCategoryRepository;
-import com.nhohantu.tcbookbe.cms.service.ICmsProductService;
+import com.nhohantu.tcbookbe.cms.repository.ICmsProductRepository;
 import com.nhohantu.tcbookbe.common.model.builder.ResponseBuilder;
 import com.nhohantu.tcbookbe.common.model.builder.ResponseDTO;
 import com.nhohantu.tcbookbe.common.model.entity.CategoryModel;
@@ -28,7 +28,7 @@ import java.util.List;
 public class CmsProductService {
     private final UserBasicInfoService userBasicInfoService;
     private final ModelMapper mapper;
-    private final ICmsProductService productRepository;
+    private final ICmsProductRepository productRepository;
     private final ICmsCategoryRepository categoryRepository;
     private final ICmsProductCategoryRepository productCategoryRepository;
 

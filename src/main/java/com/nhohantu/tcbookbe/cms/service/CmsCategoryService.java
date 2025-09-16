@@ -1,10 +1,8 @@
-package com.nhohantu.tcbookbe.cms.service.implement;
+package com.nhohantu.tcbookbe.cms.service;
 
 import com.nhohantu.tcbookbe.cms.dto.request.CmsCreateCategoryRequest;
 import com.nhohantu.tcbookbe.cms.dto.response.CmsCreateCategoryResponse;
-import com.nhohantu.tcbookbe.cms.dto.response.CmsCreateProductResponse;
 import com.nhohantu.tcbookbe.cms.repository.ICmsCategoryRepository;
-import com.nhohantu.tcbookbe.cms.service.ICmsCategoryService;
 import com.nhohantu.tcbookbe.common.model.builder.ResponseBuilder;
 import com.nhohantu.tcbookbe.common.model.builder.ResponseDTO;
 import com.nhohantu.tcbookbe.common.model.entity.CategoryModel;
@@ -19,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Log4j2
 @RequiredArgsConstructor
 public class CmsCategoryService {
-    private final ICmsCategoryService categoryService;
+    private final ICmsCategoryRepository categoryService;
     private final ModelMapper mapper;
 
 
