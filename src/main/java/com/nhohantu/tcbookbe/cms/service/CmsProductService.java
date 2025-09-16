@@ -52,7 +52,7 @@ public class CmsProductService {
 
         ProductModel product = ProductModel.builder()
                 .name(request.getName())
-                .desciption(request.getDesciption())
+                .description(request.getDesciption())
                 .price(request.getPrice())
                 .quantity(request.getQuantity() != null ? request.getQuantity() : 0)
                 .active(request.getActive() != null ? request.getActive() : false)
