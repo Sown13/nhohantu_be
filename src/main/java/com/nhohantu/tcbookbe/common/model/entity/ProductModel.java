@@ -24,8 +24,8 @@ public class ProductModel extends BaseModel {
     @Column(name = "name", columnDefinition = "VARCHAR(500)", nullable = false)
     private String name;//tên sp
 
-    @Column(name = "desciption", columnDefinition = "VARCHAR(255)")
-    private String desciption;//mô tả sp
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;//mô tả sp
 
     @Column(name = "price", columnDefinition = "DECIMAL(10,0)")
     private BigDecimal price;//giá sp
@@ -38,7 +38,7 @@ public class ProductModel extends BaseModel {
     @Column(name = "active", columnDefinition = "TINYINT(1)")
     private Boolean active;// đang bán hay không (tắt bật sản phẩm kể cả khi còn/hết hàng)
 
-    @Column(name = "main_image_url")
+    @Column(name = "main_image_url", columnDefinition = "VARCHAR(1000)")
     private String mainImageUrl; //ảnh bìa sp
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
