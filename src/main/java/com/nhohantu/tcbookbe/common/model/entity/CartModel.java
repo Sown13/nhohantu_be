@@ -5,6 +5,9 @@ import com.nhohantu.tcbookbe.common.model.system.UserBasicInfoModel;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @EqualsAndHashCode(callSuper = false)
 @Data
 @AllArgsConstructor
@@ -16,4 +19,5 @@ public class CartModel extends BaseModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserBasicInfoModel user;
+
 }
