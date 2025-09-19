@@ -1,11 +1,8 @@
-package com.nhohantu.tcbookbe.business.controller.auth;
+package com.nhohantu.tcbookbe.business.controller;
 
 import com.nhohantu.tcbookbe.business.dto.request.CartRequestDTO;
 import com.nhohantu.tcbookbe.business.service.CartService;
-import com.nhohantu.tcbookbe.common.model.base.entity.BaseModel;
-import com.nhohantu.tcbookbe.common.model.entity.CartModel;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
