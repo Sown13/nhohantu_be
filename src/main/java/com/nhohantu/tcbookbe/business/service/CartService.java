@@ -63,4 +63,31 @@ public class CartService {
 
         return cartModel;
     }
+
+    public void deleteCartItem(CartRequestDTO cartRequestDTO) {
+        UserDetails currentUser = authUtil.getCurrentUser();
+        UserBasicInfoModel user = userInfoRepo.findByUsername(currentUser.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        CartModel cartModel = cartRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
+
+        List<CartItem> items = cartItemRepository.findByCart(cartModel);
+
+        Optional<CartItem> existingItem = items.stream()
+                .filter(e -> e.getProduct().getId().equals(cartRequestDTO.getProductId()))
+                .findFirst();
+
+        if (existingItem.isPresent()) {
+
+            cartItemRepository.deleteById(existingItem.get().getId());
+
+
+            if (cartItemRepository.findByCart(cartModel).isEmpty()) {
+                cartRepository.delete(cartModel);
+            }
+        } else {
+            throw new RuntimeException("Product not found in cart");
+        }
+    }
 }

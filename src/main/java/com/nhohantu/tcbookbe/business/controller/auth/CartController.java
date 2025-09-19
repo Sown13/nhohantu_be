@@ -6,10 +6,8 @@ import com.nhohantu.tcbookbe.common.model.base.entity.BaseModel;
 import com.nhohantu.tcbookbe.common.model.entity.CartModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/cart")
@@ -19,7 +17,15 @@ public class CartController {
     private final CartService cartService;
 
     @PostMapping
-    public CartModel addCart(@RequestBody CartRequestDTO cartRequestDTO) {
-        return cartService.addCart(cartRequestDTO);
+    public ResponseEntity<String> addCart(@RequestBody CartRequestDTO cartRequestDTO) {
+        cartService.addCart(cartRequestDTO);
+        return ResponseEntity.ok("add item successfully");
     }
+
+    @DeleteMapping
+    public ResponseEntity<String> deleteCart(@RequestBody CartRequestDTO cartRequestDTO) {
+        cartService.deleteCartItem(cartRequestDTO);
+        return ResponseEntity.ok("Item deleted successfully");
+    }
+
 }

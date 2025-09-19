@@ -40,7 +40,7 @@ public class OrderService {
         for (OrderRequest orderRequest : order) {
             OrderDetailModel orderDetailModel = new OrderDetailModel();
             orderDetailModel.setOrder(orderModel);
-            orderDetailModel.setPrice(orderRequest.getPrice());
+//            orderDetailModel.setPrice(orderRequest.getPrice());
 
             orderDetailModel.setProduct(productRepository.findById(orderRequest.getOrderId()).get());
             orderDetailRepository.save(orderDetailModel);
