@@ -21,4 +21,7 @@ public class OrderDetailModel extends BaseModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private ProductModel product;
+
+    @Column(name = "price")
+    private double price;
 }
