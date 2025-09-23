@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -97,7 +98,23 @@ public class CmsCategoryService {
                     StatusCodeEnum.ERRORCODE4000);
         }
     }
-//    public ResponseEntity<ResponseDTO<List<CmsCreateCategoryResponse>>>
+    public ResponseEntity<ResponseDTO<List<CmsCreateCategoryResponse>>> findAllCategoryLevel3(){
+        try{
+            List<CategoryModel> categories = categoryService.findByCategoryLevel(3);
+
+            List<CmsCreateCategoryResponse> responseList = categories.stream()
+                    .map(category-> mapper.map(category, CmsCreateCategoryResponse.class))
+                    .collect(Collectors.toList());
+
+            return ResponseBuilder.okResponse("Lấy danh sách danh mục cấp 3 thành công", responseList, StatusCodeEnum.SUCCESS2000);
+
+        }catch (IllegalArgumentException e){
+            log.error(e.getMessage());
+            return ResponseBuilder.badRequestResponse(e.getMessage(),
+                    StatusCodeEnum.ERRORCODE4000);
+        }
+
+    }
 }
 
 

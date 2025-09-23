@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/cms/category")
 @RequiredArgsConstructor
@@ -21,5 +23,10 @@ public class CmsCategoryController {
     @GetMapping("/{id}")
     public ResponseEntity<ResponseDTO<CmsCreateCategoryResponse>> getCategory(@PathVariable Long id){
         return categoryService.getCategory(id);
+    }
+
+    @GetMapping("/level3")
+    public ResponseEntity<ResponseDTO<List<CmsCreateCategoryResponse>>> findAllCategoryLevel3() {
+        return categoryService.findAllCategoryLevel3();
     }
 }
