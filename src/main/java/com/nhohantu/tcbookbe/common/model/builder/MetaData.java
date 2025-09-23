@@ -15,5 +15,5 @@ public class MetaData {
     private int totalPage;
     private int currentPage;
     private int pageSize;
-    private int totalItems;
+    private long totalItems;
 }

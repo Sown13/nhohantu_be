@@ -20,7 +20,7 @@ public class OrderModel extends BaseModel {
     @JoinColumn(name = "user_id")
     private UserBasicInfoModel user;
 
-    private BigDecimal totalPrice;
+//    private BigDecimal totalPrice;
 
     private String status;//todo chắc đổi qua enum
 }
