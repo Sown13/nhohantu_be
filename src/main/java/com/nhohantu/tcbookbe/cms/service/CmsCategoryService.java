@@ -2,6 +2,7 @@ package com.nhohantu.tcbookbe.cms.service;
 
 import com.nhohantu.tcbookbe.cms.dto.request.CmsCreateCategoryRequest;
 import com.nhohantu.tcbookbe.cms.dto.response.CmsCreateCategoryResponse;
+import com.nhohantu.tcbookbe.cms.dto.response.CmsListCategoryResponse;
 import com.nhohantu.tcbookbe.cms.repository.ICmsCategoryRepository;
 import com.nhohantu.tcbookbe.common.model.builder.ResponseBuilder;
 import com.nhohantu.tcbookbe.common.model.builder.ResponseDTO;
@@ -14,7 +15,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -65,11 +68,7 @@ public class CmsCategoryService {
                 }
             }
 
-            CategoryModel category = CategoryModel.builder()
-                    .name(request.getName())
-                    .parentCategory(parentCategory)
-                    .categoryLevel(categoryLevel)
-                    .build();
+            CategoryModel category = CategoryModel.builder().name(request.getName()).parentCategory(parentCategory).categoryLevel(categoryLevel).build();
 
             CategoryModel result = categoryService.save(category);
             CmsCreateCategoryResponse response = mapper.map(result, CmsCreateCategoryResponse.class);
@@ -84,37 +83,71 @@ public class CmsCategoryService {
         }
     }
 
-    public ResponseEntity<ResponseDTO<CmsCreateCategoryResponse>> getCategory(Long id) {
+    //    public ResponseEntity<ResponseDTO<CmsCreateCategoryResponse>> getCategory(Long id) {
+//        try {
+//            CategoryModel foundCategory = categoryService.findById(id)
+//                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy danh mục với id " + id));
+//
+//            CmsCreateCategoryResponse response = mapper.map(foundCategory, CmsCreateCategoryResponse.class);
+//            return ResponseBuilder.okResponse("Lấy thông tin danh mục thành công", response,
+//                    StatusCodeEnum.SUCCESS2000);
+//        } catch (IllegalArgumentException e) {
+//            log.error(e.getMessage());
+//            return ResponseBuilder.badRequestResponse(e.getMessage(),
+//                    StatusCodeEnum.ERRORCODE4000);
+//        }
+//    }
+    public ResponseEntity<ResponseDTO<List<CmsCreateCategoryResponse>>> findAllCategoryLevel3() {
         try {
-            CategoryModel foundCategory = categoryService.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy danh mục với id " + id));
-
-            CmsCreateCategoryResponse response = mapper.map(foundCategory, CmsCreateCategoryResponse.class);
-            return ResponseBuilder.okResponse("Lấy thông tin danh mục thành công", response,
-                    StatusCodeEnum.SUCCESS2000);
-        } catch (IllegalArgumentException e) {
-            log.error(e.getMessage());
-            return ResponseBuilder.badRequestResponse(e.getMessage(),
-                    StatusCodeEnum.ERRORCODE4000);
-        }
-    }
-    public ResponseEntity<ResponseDTO<List<CmsCreateCategoryResponse>>> findAllCategoryLevel3(){
-        try{
             List<CategoryModel> categories = categoryService.findByCategoryLevel(3);
 
-            List<CmsCreateCategoryResponse> responseList = categories.stream()
-                    .map(category-> mapper.map(category, CmsCreateCategoryResponse.class))
-                    .collect(Collectors.toList());
+            List<CmsCreateCategoryResponse> responseList = categories.stream().map(category -> mapper.map(category, CmsCreateCategoryResponse.class)).collect(Collectors.toList());
 
             return ResponseBuilder.okResponse("Lấy danh sách danh mục cấp 3 thành công", responseList, StatusCodeEnum.SUCCESS2000);
 
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             log.error(e.getMessage());
-            return ResponseBuilder.badRequestResponse(e.getMessage(),
-                    StatusCodeEnum.ERRORCODE4000);
+            return ResponseBuilder.badRequestResponse(e.getMessage(), StatusCodeEnum.ERRORCODE4000);
         }
 
     }
+
+    public ResponseEntity<ResponseDTO<List<CmsListCategoryResponse>>> findAllCategory() {
+        try {
+            List<CategoryModel> allCategories = categoryService.findAll();
+            Map<Long, CmsListCategoryResponse> categoryMap = allCategories.stream()
+                    .map(category -> mapper.map(category, CmsListCategoryResponse.class))
+                    .collect(Collectors.toMap(CmsListCategoryResponse::getId, category -> category));
+
+            List<CmsListCategoryResponse> rootCategories = new ArrayList<>();
+            for (CmsListCategoryResponse category : categoryMap.values()) {
+                if (category.getParentId() != null) {
+                    CmsListCategoryResponse parent = categoryMap.get(category.getParentId());
+                    if (parent != null) {
+                        if (parent.getChildren() == null) {
+                            parent.setChildren(new ArrayList<>());
+                        }
+                        parent.getChildren().add(category);
+                    }
+                } else {
+                    rootCategories.add(category);
+                }
+            }
+
+            return ResponseBuilder.okResponse(
+                    "Lấy danh sách danh mục thành công",
+                    rootCategories,
+                    StatusCodeEnum.SUCCESS2000
+            );
+        } catch (IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseBuilder.badRequestResponse(
+                    e.getMessage(),
+                    StatusCodeEnum.ERRORCODE4000
+            );
+        }
+    }
+
 }
 
 
