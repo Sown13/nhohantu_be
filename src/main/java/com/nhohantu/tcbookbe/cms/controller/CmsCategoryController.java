@@ -17,7 +17,7 @@ import java.util.List;
 public class CmsCategoryController {
     private final CmsCategoryService categoryService;
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<ResponseDTO<CmsCreateCategoryResponse>> createCategory(@RequestBody CmsCreateCategoryRequest request){
         return categoryService.createCategory(request);
     }
