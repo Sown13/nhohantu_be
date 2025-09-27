@@ -115,10 +115,12 @@ public class CmsCategoryService {
     public ResponseEntity<ResponseDTO<List<CmsListCategoryResponse>>> findAllCategory() {
         try {
             List<CategoryModel> allCategories = categoryService.findAll();
+
+            //convert CategoryModel -> CmsListCategoryResponse
             Map<Long, CmsListCategoryResponse> categoryMap = allCategories.stream()
                     .map(category -> mapper.map(category, CmsListCategoryResponse.class))
                     .collect(Collectors.toMap(CmsListCategoryResponse::getId, category -> category));
-
+            // Build category tree
             List<CmsListCategoryResponse> rootCategories = new ArrayList<>();
             for (CmsListCategoryResponse category : categoryMap.values()) {
                 if (category.getParentId() != null) {
@@ -130,10 +132,9 @@ public class CmsCategoryService {
                         parent.getChildren().add(category);
                     }
                 } else {
-                    rootCategories.add(category);
+                    rootCategories.add(category); //add categories lv1 in list
                 }
             }
-
             return ResponseBuilder.okResponse(
                     "Lấy danh sách danh mục thành công",
                     rootCategories,
