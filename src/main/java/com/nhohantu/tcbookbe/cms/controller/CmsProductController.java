@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/cms/products")
 @RequiredArgsConstructor
@@ -27,6 +29,18 @@ public class CmsProductController {
 //    public ResponseEntity<ProductResponseDTO> getProduct(@PathVariable Long id) {
 //        return ResponseEntity.ok(productService.getProduct(id));
 //    }
+@GetMapping("/get/all")
+public ResponseEntity<ResponseDTO<List<CmsGetProductDetailResponse>>> getAllProducts() {
+    List<CmsGetProductDetailResponse> products = getproductDetailService.getAllProducts();
+
+    ResponseDTO<List<CmsGetProductDetailResponse>> response = ResponseDTO.<List<CmsGetProductDetailResponse>>builder()
+            .success(true)
+            .message("Get all products successfully")
+            .data(products)
+            .build();
+
+    return ResponseEntity.ok(response);
+}
 
     // TODO: update, delete
 
