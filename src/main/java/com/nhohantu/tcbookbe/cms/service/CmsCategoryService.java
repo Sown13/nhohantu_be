@@ -1,9 +1,4 @@
-<<<<<<<< HEAD:src/main/java/com/nhohantu/tcbookbe/cms/service/implement/CmsCategoryService.java
-
-package com.nhohantu.tcbookbe.cms.service.implement;
-========
 package com.nhohantu.tcbookbe.cms.service;
->>>>>>>> a7d15a8 (feat: Moved CmsCategoryService.java out of implement directory to comply with new project structure):src/main/java/com/nhohantu/tcbookbe/cms/service/CmsCategoryService.java
 
 import com.nhohantu.tcbookbe.cms.dto.request.CmsCreateCategoryRequest;
 import com.nhohantu.tcbookbe.cms.dto.response.CmsCreateCategoryResponse;
@@ -12,7 +7,6 @@ import com.nhohantu.tcbookbe.cms.repository.ICmsCategoryRepository;
 import com.nhohantu.tcbookbe.common.model.builder.ResponseBuilder;
 import com.nhohantu.tcbookbe.common.model.builder.ResponseDTO;
 import com.nhohantu.tcbookbe.common.model.entity.CategoryModel;
-import com.nhohantu.tcbookbe.common.model.enums.CategoryLevelDefault;
 import com.nhohantu.tcbookbe.common.model.enums.StatusCodeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -79,8 +73,8 @@ public class CmsCategoryService {
             CmsCreateCategoryResponse response = mapper.map(result, CmsCreateCategoryResponse.class);
 
             return ResponseBuilder.okResponse("Tạo danh mục thành công", response, StatusCodeEnum.SUCCESS2000);
-
         } catch (IllegalArgumentException e) {
+            log.error("Lỗi khi tạo danh mục: " + e.getMessage(), e);
             return ResponseBuilder.badRequestResponse(e.getMessage(), StatusCodeEnum.ERRORCODE4000);
         } catch (Exception e) {
             log.error("Lỗi khi tạo danh mục: " + e.getMessage(), e);
@@ -88,20 +82,6 @@ public class CmsCategoryService {
         }
     }
 
-    //    public ResponseEntity<ResponseDTO<CmsCreateCategoryResponse>> getCategory(Long id) {
-//        try {
-//            CategoryModel foundCategory = categoryService.findById(id)
-//                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy danh mục với id " + id));
-//
-//            CmsCreateCategoryResponse response = mapper.map(foundCategory, CmsCreateCategoryResponse.class);
-//            return ResponseBuilder.okResponse("Lấy thông tin danh mục thành công", response,
-//                    StatusCodeEnum.SUCCESS2000);
-//        } catch (IllegalArgumentException e) {
-//            log.error(e.getMessage());
-//            return ResponseBuilder.badRequestResponse(e.getMessage(),
-//                    StatusCodeEnum.ERRORCODE4000);
-//        }
-//    }
     public ResponseEntity<ResponseDTO<List<CmsCreateCategoryResponse>>> findAllCategoryLevel3() {
         try {
             List<CategoryModel> categories = categoryService.findByCategoryLevel(3);
