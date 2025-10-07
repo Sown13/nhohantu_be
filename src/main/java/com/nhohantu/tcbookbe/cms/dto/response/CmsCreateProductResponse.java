@@ -1,5 +1,6 @@
 package com.nhohantu.tcbookbe.cms.dto.response;
 
+import com.nhohantu.tcbookbe.cms.dto.request.CmsCreateProductRequest;
 import com.nhohantu.tcbookbe.common.model.entity.CategoryModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,10 +14,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CmsCreateProductResponse {
+public class CmsCreateProductResponse extends CmsCreateProductRequest {
     private Long id;
     private String name;
-    private String desciption;
+    private String description;
     private String coverUrl;
     private BigDecimal price;
     private Integer quantity;

@@ -52,7 +52,7 @@ public class CmsProductService {
 
         ProductModel product = ProductModel.builder()
                 .name(request.getName())
-                .description(request.getDesciption())
+                .description(request.getDescription())
                 .price(request.getPrice())
                 .quantity(request.getQuantity() != null ? request.getQuantity() : 0)
                 .active(request.getActive() != null ? request.getActive() : false)
@@ -90,4 +90,32 @@ public class CmsProductService {
 //        List<CategoryModel> categories = productCategories.stream().map(ProductCategoryModel::getCategory).toList();
 //        return toResponse(product, categories);
 //    }
+
+    public CmsCreateProductResponse updateProduct(Long id, CmsCreateProductRequest request) {
+        ProductModel productModel = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Id not found for update"));
+        productModel.setName(request.getName());
+        request.setDescription(request.getDescription());
+        productModel.setPrice(request.getPrice());
+        productModel.setQuantity(request.getQuantity());
+        productModel.setMainImageUrl(request.getMainImageUrl());
+        productModel.setActive(request.getActive());
+
+        ProductModel update = productRepository.save(productModel);
+                return CmsCreateProductResponse.builder()
+                        .name(update.getName())
+                        .description(update.getDescription())
+                        .price(update.getPrice())
+                        .quantity(update.getQuantity())
+                        .mainImageUrl(update.getMainImageUrl())
+                        .active(update.getActive())
+                        .build();
+    }
+
+    public void deleteProduct(Long id) {
+        ProductModel productModel = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Id not found for delete"));
+
+         productRepository.delete(productModel);
+    }
 }

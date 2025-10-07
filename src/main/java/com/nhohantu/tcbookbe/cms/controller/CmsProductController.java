@@ -25,6 +25,11 @@ public class CmsProductController {
         return productService.createProduct(request);
     }
 
+//    @PutMapping
+//    public ResponseEntity<ResponseDTO<CmsCreateProductResponse>> updateProduct(@RequestBody CmsCreateProductRequest request) {
+//        return null;
+//    }
+
 //    @GetMapping("/{id}")
 //    public ResponseEntity<ProductResponseDTO> getProduct(@PathVariable Long id) {
 //        return ResponseEntity.ok(productService.getProduct(id));
@@ -43,6 +48,33 @@ public ResponseEntity<ResponseDTO<List<CmsGetProductDetailResponse>>> getAllProd
 }
 
     // TODO: update, delete
+    @PutMapping("/{id}")
+    public ResponseEntity<ResponseDTO<CmsCreateProductResponse>> updateProduct(
+            @PathVariable Long id,
+            @RequestBody CmsCreateProductRequest request) {
+
+        CmsCreateProductResponse updatedProduct = productService.updateProduct(id, request);
+
+        ResponseDTO<CmsCreateProductResponse> response = ResponseDTO.<CmsCreateProductResponse>builder()
+                .success(true)
+                .message("Product updated successfully")
+                .data(updatedProduct)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseDTO<Void>> deleteProduct(@PathVariable Long id) {
+        productService.deleteProduct(id);
+
+        ResponseDTO<Void> response = ResponseDTO.<Void>builder()
+                .success(true)
+                .message("Product deleted successfully")
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
 
     @GetMapping("/get/{id}")
     public ResponseEntity<ResponseDTO<CmsGetProductDetailResponse>> getProductDetail(@PathVariable Long id) {
