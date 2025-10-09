@@ -94,7 +94,6 @@ public class CmsCategoryService {
             log.error(e.getMessage());
             return ResponseBuilder.badRequestResponse(e.getMessage(), StatusCodeEnum.ERRORCODE4000);
         }
-
     }
 
     public ResponseEntity<ResponseDTO<List<CmsListCategoryResponse>>> findAllCategory() {
