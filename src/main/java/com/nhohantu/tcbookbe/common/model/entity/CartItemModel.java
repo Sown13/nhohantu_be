@@ -11,7 +11,7 @@ import lombok.*;
 @Builder
 @Table(name = "cart_item")
 @Entity
-public class CartItem extends BaseModel {
+public class CartItemModel extends BaseModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id")
     private CartModel cart;

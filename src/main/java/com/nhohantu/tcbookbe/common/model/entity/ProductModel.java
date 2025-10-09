@@ -1,5 +1,6 @@
 package com.nhohantu.tcbookbe.common.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.nhohantu.tcbookbe.business.converter.JsonConverter;
 import com.nhohantu.tcbookbe.common.model.base.entity.BaseModel;
 import com.nhohantu.tcbookbe.common.utils.Constant;
@@ -78,6 +79,7 @@ public class ProductModel extends BaseModel {
 
     // --- Relationships ---
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<ProductCategoryModel> productCategories = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
