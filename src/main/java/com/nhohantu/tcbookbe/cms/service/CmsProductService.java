@@ -95,7 +95,7 @@ public class CmsProductService {
         ProductModel productModel = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Id not found for update"));
         productModel.setName(request.getName());
-        request.setDescription(request.getDescription());
+        productModel.setDescription(request.getDescription());
         productModel.setPrice(request.getPrice());
         productModel.setQuantity(request.getQuantity());
         productModel.setMainImageUrl(request.getMainImageUrl());
