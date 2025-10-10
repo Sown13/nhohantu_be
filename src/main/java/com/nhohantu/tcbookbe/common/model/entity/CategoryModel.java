@@ -1,5 +1,7 @@
 package com.nhohantu.tcbookbe.common.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.nhohantu.tcbookbe.common.model.base.entity.BaseModel;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,9 +32,11 @@ public class CategoryModel extends BaseModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
+    @JsonBackReference
     private CategoryModel parentCategory; // Danh mục cha
 
     @OneToMany(mappedBy = "parentCategory", fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<CategoryModel> childCategory; // Danh mục con
 
     @Column(name = "category_level")

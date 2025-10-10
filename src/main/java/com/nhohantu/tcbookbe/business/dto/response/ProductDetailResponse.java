@@ -1,7 +1,6 @@
 package com.nhohantu.tcbookbe.business.dto.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,8 +11,7 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class GetProductListResponse {
+public class ProductDetailResponse {
     private Long id;
     private String name;
     private String slug;
@@ -25,8 +23,7 @@ public class GetProductListResponse {
     private BigDecimal salePrice;
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
-    private AttachmentResponse mainImage;
-    private String sku;
+    private AttachmentResponse image; // ảnh chính
     private List<AttachmentResponse> gallery;
     private CategoryResponse category;
     private List<TagResponse> tag;
