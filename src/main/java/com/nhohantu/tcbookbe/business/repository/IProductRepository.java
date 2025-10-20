@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -34,4 +35,6 @@ public interface IProductRepository extends BaseProductRepository {
     );
 
     Optional<ProductModel> findBySlug(String slug);
+
+    List<ProductModel> findBestProductByOrderByRatingDesc();
 }
