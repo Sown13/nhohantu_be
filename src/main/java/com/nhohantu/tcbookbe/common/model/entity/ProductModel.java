@@ -21,6 +21,7 @@ import java.util.Map;
 @Table(name = "product")
 @Entity
 public class ProductModel extends BaseModel {
+
     @Column(name = "name", columnDefinition = "VARCHAR(500)", nullable = false)
     private String name;
 
@@ -49,7 +50,6 @@ public class ProductModel extends BaseModel {
     private Boolean active;
 
     @Column(name = "main_image_url", columnDefinition = "VARCHAR(1000)")
-
     private String mainImageUrl = Constant.DEFAULT_IMAGE_URL;
 
     @Column(name = "video_url", columnDefinition = "VARCHAR(1000)")

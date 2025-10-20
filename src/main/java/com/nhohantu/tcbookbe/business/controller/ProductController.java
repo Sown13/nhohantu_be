@@ -54,4 +54,11 @@ public class ProductController {
                 text, category, active, priceMin, priceMax, page, limit, sortBy
         );
     }
+
+    @GetMapping("/best-seller-products")
+    public ResponseEntity<ResponseDTO<List<GetProductListResponse>>> getBestSellerProducts(
+            @RequestParam(defaultValue = "10") Integer limit
+    ) {
+        return productService.getBestSellerProducts(limit);
+    }
 }

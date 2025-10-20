@@ -14,7 +14,10 @@ import java.util.List;
 public class CmsListCategoryResponse {
     private Long id;
     private String name;
+    private String slug;
+    private String imageUrl;
     private Long parentId;
     private Integer categoryLevel;
+    private Long productCount; // optional
     private List<CmsListCategoryResponse> children;
 }

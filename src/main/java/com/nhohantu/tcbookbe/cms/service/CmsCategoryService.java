@@ -100,11 +100,18 @@ public class CmsCategoryService {
         try {
             List<CategoryModel> allCategories = categoryService.findAll();
 
-            //convert CategoryModel -> CmsListCategoryResponse
             Map<Long, CmsListCategoryResponse> categoryMap = allCategories.stream()
-                    .map(category -> mapper.map(category, CmsListCategoryResponse.class))
-                    .collect(Collectors.toMap(CmsListCategoryResponse::getId, category -> category));
-            // Build category tree
+                    .map(category -> {
+                        CmsListCategoryResponse dto = mapper.map(category, CmsListCategoryResponse.class);
+
+                        long productCount = category.getProductCategories() != null ? category.getProductCategories().size() : 0L;
+                        dto.setProductCount(productCount);
+
+                        return dto;
+                    })
+                    .collect(Collectors.toMap(CmsListCategoryResponse::getId, c -> c));
+
+            // Build the category tree
             List<CmsListCategoryResponse> rootCategories = new ArrayList<>();
             for (CmsListCategoryResponse category : categoryMap.values()) {
                 if (category.getParentId() != null) {
@@ -116,16 +123,17 @@ public class CmsCategoryService {
                         parent.getChildren().add(category);
                     }
                 } else {
-                    rootCategories.add(category); //add categories lv1 in list
+                    rootCategories.add(category);
                 }
             }
+
             return ResponseBuilder.okResponse(
                     "Lấy danh sách danh mục thành công",
                     rootCategories,
                     StatusCodeEnum.SUCCESS2000
             );
-        } catch (IllegalArgumentException e) {
-            log.error(e.getMessage());
+        } catch (Exception e) {
+            log.error("Error fetching categories: {}", e.getMessage(), e);
             return ResponseBuilder.badRequestResponse(
                     e.getMessage(),
                     StatusCodeEnum.ERRORCODE4000

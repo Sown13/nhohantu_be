@@ -244,4 +244,25 @@ public class ProductService {
         return name.toLowerCase().replaceAll("[^a-z0-9]+", "-").replaceAll("-+$", "");
     }
 
+    public ResponseEntity<ResponseDTO<List<GetProductListResponse>>> getBestSellerProducts(Integer limit) {
+        try {
+            List<ProductModel> products = productRepository.findBestProductByOrderByRatingDesc()
+                    .stream()
+                    .limit(limit)
+                    .toList();
+
+            List<GetProductListResponse> response = products.stream()
+                    .map(this::mapToProductResponse)
+                    .toList();
+
+            return ResponseBuilder.okResponse(
+                    "SUCCESS",
+                    response,
+                    StatusCodeEnum.SUCCESS2000
+            );
+        } catch (Exception e) {
+            log.error("Error while fetching best-seller products", e);
+            return ResponseBuilder.badRequestResponse("ERROR", StatusCodeEnum.ERRORCODE4000);
+        }
+    }
 }

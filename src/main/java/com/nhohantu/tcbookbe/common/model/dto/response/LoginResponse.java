@@ -13,4 +13,12 @@ public class LoginResponse {
     private String token;
 
     private long expiresIn;
+
+    private String username;
+
+    private String email;
+
+    private String first_name;
+
+    private String last_name;
 }
