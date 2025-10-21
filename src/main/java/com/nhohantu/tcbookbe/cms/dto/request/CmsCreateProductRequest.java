@@ -1,11 +1,10 @@
 package com.nhohantu.tcbookbe.cms.dto.request;
 
-<<<<<<< HEAD
-import lombok.Builder;
-=======
+
+
 import com.nhohantu.tcbookbe.common.utils.Constant;
 import io.swagger.v3.oas.annotations.media.Schema;
->>>>>>> 52092c56e57812fd35f5e0a684f56b3eb63f817e
+
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -35,15 +34,15 @@ public class CmsCreateProductRequest {
     private Map<String, Object> variations;
 
     private List<Long> categoryIds; // bắt buộc phải có ít nhất 1
-<<<<<<< HEAD
+
 
     public CmsCreateProductRequest() {
     }
 
 
-=======
+
     private List<AttachmentRequest> gallery; // List ảnh upload
     private List<Long> tagIds; // tag ids nếu có
->>>>>>> 52092c56e57812fd35f5e0a684f56b3eb63f817e
+
     //todo cần xử lý upload và lưu ảnh
 }

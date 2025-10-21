@@ -1,95 +1,4 @@
 package com.nhohantu.tcbookbe.business.service;
-<<<<<<< HEAD
-import com.nhohantu.tcbookbe.business.dto.request.CartRequestDTO;
-import com.nhohantu.tcbookbe.business.repository.ICartItemRepository;
-import com.nhohantu.tcbookbe.business.repository.ICartRepository;
-import com.nhohantu.tcbookbe.business.repository.IProductRepository;
-import com.nhohantu.tcbookbe.common.model.entity.CartItem;
-import com.nhohantu.tcbookbe.common.model.entity.CartModel;
-import com.nhohantu.tcbookbe.common.model.entity.ProductModel;
-import com.nhohantu.tcbookbe.common.model.system.UserBasicInfoModel;
-import com.nhohantu.tcbookbe.common.repository.BaseUserInfoRepo;
-import com.nhohantu.tcbookbe.common.utils.AuthUtil;
-import lombok.AllArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-
-@Service
-@AllArgsConstructor
-public class CartService {
-    private final ICartRepository cartRepository;
-    private final ICartItemRepository cartItemRepository;
-    private final AuthUtil authUtil;
-    private final IProductRepository productRepository;
-    private final BaseUserInfoRepo userInfoRepo;
-
-    public CartModel addCart(CartRequestDTO cartRequestDTO) {
-
-        UserDetails currentUser = authUtil.getCurrentUser();
-        UserBasicInfoModel user = userInfoRepo.findByUsername(currentUser.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-
-        CartModel cartModel = cartRepository.findByUser(user)
-                .orElseGet(() -> {
-                    CartModel newCart = new CartModel();
-                    newCart.setUser(user);
-                    return cartRepository.save(newCart);
-                });
-
-
-        ProductModel productModel = productRepository.findById(cartRequestDTO.getProductId())
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-
-
-        List<CartItem> items = cartItemRepository.findByCart(cartModel);
-        Optional<CartItem> existingItem = items.stream()
-                .filter(e -> e.getProduct().getId().equals(productModel.getId()))
-                .findFirst();
-
-        if (existingItem.isPresent()) {
-            CartItem item = existingItem.get();
-            item.setQuantity(item.getQuantity() + cartRequestDTO.getQuantity());
-            cartItemRepository.save(item);
-        } else {
-            CartItem newCartItem = new CartItem();
-            newCartItem.setCart(cartModel);
-            newCartItem.setProduct(productModel);
-            newCartItem.setQuantity(cartRequestDTO.getQuantity());
-            cartItemRepository.save(newCartItem);
-        }
-
-        return cartModel;
-    }
-
-    public void deleteCartItem(CartRequestDTO cartRequestDTO) {
-        UserDetails currentUser = authUtil.getCurrentUser();
-        UserBasicInfoModel user = userInfoRepo.findByUsername(currentUser.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        CartModel cartModel = cartRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
-
-        List<CartItem> items = cartItemRepository.findByCart(cartModel);
-
-        Optional<CartItem> existingItem = items.stream()
-                .filter(e -> e.getProduct().getId().equals(cartRequestDTO.getProductId()))
-                .findFirst();
-
-        if (existingItem.isPresent()) {
-
-            cartItemRepository.deleteById(existingItem.get().getId());
-
-
-            if (cartItemRepository.findByCart(cartModel).isEmpty()) {
-                cartRepository.delete(cartModel);
-            }
-        } else {
-            throw new RuntimeException("Product not found in cart");
-=======
 
 import com.nhohantu.tcbookbe.business.dto.request.AddItemToCartRequest;
 import com.nhohantu.tcbookbe.business.repository.ICartItemRepository;
@@ -157,7 +66,6 @@ public class CartService {
             return ResponseBuilder.okResponse("Thêm vào giỏ hàng thành công", StatusCodeEnum.SUCCESS2000);
         } catch (Exception e) {
             return ResponseBuilder.badRequestResponse("Thêm vào giỏ hàng thất bại", StatusCodeEnum.ERRORCODE4000);
->>>>>>> 52092c56e57812fd35f5e0a684f56b3eb63f817e
         }
     }
 }
