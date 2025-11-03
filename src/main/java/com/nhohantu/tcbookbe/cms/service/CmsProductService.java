@@ -70,6 +70,8 @@ public class CmsProductService {
 
         product.setProductCategories(productCategories);
 
+        product.setSlug("");
+
         try {
             ProductModel result = productRepository.save(product);
             CmsCreateProductResponse response = mapper.map(result, CmsCreateProductResponse.class);
