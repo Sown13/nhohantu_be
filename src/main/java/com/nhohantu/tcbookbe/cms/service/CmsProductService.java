@@ -103,6 +103,8 @@ public class CmsProductService {
             product.setTags(tags);
         }
 
+        product.setSlug("");
+
         try {
             ProductModel result = productRepository.save(product);
             CmsCreateProductResponse response = mapper.map(result, CmsCreateProductResponse.class);
