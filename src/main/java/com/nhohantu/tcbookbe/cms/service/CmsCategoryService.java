@@ -120,6 +120,7 @@ public class CmsCategoryService {
             Map<Long, CmsListCategoryResponse> categoryMap = allCategories.stream()
                     .map(category -> mapper.map(category, CmsListCategoryResponse.class))
                     .collect(Collectors.toMap(CmsListCategoryResponse::getId, category -> category));
+
             // Build category tree
             List<CmsListCategoryResponse> rootCategories = new ArrayList<>();
             for (CmsListCategoryResponse category : categoryMap.values()) {
