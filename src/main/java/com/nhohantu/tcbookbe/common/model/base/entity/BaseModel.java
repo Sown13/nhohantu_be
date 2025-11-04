@@ -30,6 +30,6 @@ public class BaseModel {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @Column(name = "is_deleted", columnDefinition = "TINYINT(1)")
+    @Column(name = "is_deleted", columnDefinition = "TINYINT(1) DEFAULT(0)")
     private boolean isDeleted;
 }

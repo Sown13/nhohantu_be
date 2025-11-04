@@ -1,15 +1,20 @@
-package com.nhohantu.tcbookbe.cms.dto.request;
+package com.nhohantu.tcbookbe.business.dto.response;
 
-import com.nhohantu.tcbookbe.common.model.entity.CategoryModel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CmsCreateCategoryRequest {
+public class CategoryResponse {
+    private Long id;
     private String name;
     private Long parentId;
     private Integer categoryLevel;
+
+    public CategoryResponse(Long id, String name) {
+    }
 }
