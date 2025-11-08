@@ -107,14 +107,30 @@ public class CmsProductService {
 
         try {
             ProductModel result = productRepository.save(product);
-            CmsCreateProductResponse response = mapper.map(result, CmsCreateProductResponse.class);
+
+            List<CategoryModel> catList = result.getProductCategories().stream()
+                    .map(ProductCategoryModel::getCategory)
+                    .toList();
+
+            CmsCreateProductResponse response = CmsCreateProductResponse.builder()
+                    .id(result.getId())
+                    .name(result.getName())
+                    .description(result.getDescription())
+                    .price(result.getPrice())
+                    .quantity(result.getQuantity())
+                    .active(result.getActive())
+                    .mainImageUrl(result.getMainImageUrl())
+                    .categories(catList)
+                    .build();
 
             return ResponseBuilder.okResponse("Tạo sản phẩm thành công", response, StatusCodeEnum.SUCCESS2000);
+
         } catch (Exception e) {
             log.error("Lỗi khi tạo sản phẩm", e);
             return ResponseBuilder.badRequestResponse("Tạo sản phẩm thất bại. Lỗi khi tạo sản phẩm",
                     StatusCodeEnum.ERRORCODE4000);
         }
+
     }
 
     private String generateSlug(String name) {

@@ -14,16 +14,17 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CmsCreateProductResponse {
+public class CmsGetProductDetailResponse {
     private Long id;
     private String name;
-    private String desciption;
-    private String coverUrl;
+    private String description;
     private BigDecimal price;
     private Integer quantity;
     private Boolean active;
     private String mainImageUrl;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private List<CategoryModel> categories; // danh sách tên category
+    private List<CategoryModel> categories;
+
+
 }
