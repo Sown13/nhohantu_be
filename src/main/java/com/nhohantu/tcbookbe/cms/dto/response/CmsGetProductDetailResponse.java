@@ -25,6 +25,5 @@ public class CmsGetProductDetailResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<CategoryModel> categories;
-
-
+    private List<CmsTagResponse> tagIds;
 }

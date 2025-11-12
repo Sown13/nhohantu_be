@@ -1,10 +1,12 @@
 package com.nhohantu.tcbookbe.cms.service;
 
 import com.nhohantu.tcbookbe.cms.dto.response.CmsGetProductDetailResponse;
+import com.nhohantu.tcbookbe.cms.dto.response.CmsTagResponse;
 import com.nhohantu.tcbookbe.cms.repository.ICmsGetProductDetailRepository;
 import com.nhohantu.tcbookbe.common.model.entity.CategoryModel;
 import com.nhohantu.tcbookbe.common.model.entity.ProductCategoryModel;
 import com.nhohantu.tcbookbe.common.model.entity.ProductModel;
+import com.nhohantu.tcbookbe.common.model.entity.TagModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CmsGetProductDetailService {
     private final ICmsGetProductDetailRepository cmsGetProductDetailRepository;
+    private List<CmsTagResponse> tags;
+
 
     public CmsGetProductDetailResponse getProductDetailById(Long id) {
         ProductModel productModel = cmsGetProductDetailRepository.findById(id)
@@ -30,6 +34,10 @@ public class CmsGetProductDetailService {
                 })
                 .toList();
 
+        List<CmsTagResponse> tags = productModel.getTags().stream()
+                .map(tag -> new CmsTagResponse(tag.getId(), tag.getName()))
+                .collect(Collectors.toList());
+
         return CmsGetProductDetailResponse.builder()
                 .id(productModel.getId())
                 .name(productModel.getName())
@@ -39,6 +47,7 @@ public class CmsGetProductDetailService {
                 .quantity(productModel.getQuantity())
                 .description(productModel.getDescription())
                 .categories(catList)
+                .tagIds(tags)
                 .createdAt(productModel.getCreatedAt())
                 .updatedAt(productModel.getUpdatedAt())
                 .build();
