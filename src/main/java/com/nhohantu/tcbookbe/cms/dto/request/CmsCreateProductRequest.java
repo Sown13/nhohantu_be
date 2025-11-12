@@ -5,6 +5,7 @@ package com.nhohantu.tcbookbe.cms.dto.request;
 import com.nhohantu.tcbookbe.common.utils.Constant;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;

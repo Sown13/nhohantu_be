@@ -10,4 +10,5 @@ import java.util.List;
 public interface ICmsCategoryRepository extends BaseCategoryRepository {
     List<CategoryModel> findByCategoryLevel(Integer categoryLevel);
     List<CategoryModel> findAll();
+    List<CategoryModel> findAllByCategoryLevel(Integer categoryLevel);
 }

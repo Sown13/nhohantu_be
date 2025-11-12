@@ -27,4 +27,5 @@ public class CmsCreateProductResponse extends CmsCreateProductRequest {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<CategoryModel> categories; // danh sách tên category
+    private List<Long> tagIds;
 }
