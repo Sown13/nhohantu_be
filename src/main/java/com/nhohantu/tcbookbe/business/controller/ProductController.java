@@ -29,13 +29,8 @@ public class ProductController {
         return productService.getProducts(pageNumber, pageSize, sortBy, sortDirection);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ResponseDTO<GetProductDetailResponse>> getProductDetail(@PathVariable("id") Long id) {
-        return productService.getProductDetailById(id);
-    }
-
     @GetMapping("/{slug}")
-    public ResponseEntity<ResponseDTO<ProductDetailResponse>> getProductDetail(@PathVariable String slug) {
+    public ResponseEntity<ResponseDTO<ProductDetailResponse>> getProductDetailSlug(@PathVariable String slug) {
         return productService.getProductBySlug(slug);
     }
 
@@ -61,4 +56,17 @@ public class ProductController {
     ) {
         return productService.getBestSellerProducts(limit);
     }
+
+    @GetMapping("/on-sale-products")
+    public ResponseEntity<ResponseDTO<List<GetProductListResponse>>> getOnSaleProducts(
+            @RequestParam(defaultValue = "10") Integer limit
+    ) {
+        return productService.getMostOrderedProducts(limit);
+    }
+
+    @GetMapping("/{slug}/related")
+    public ResponseEntity<ResponseDTO<List<GetProductListResponse>>> getRelatedProducts(@PathVariable String slug) {
+        return productService.getRelatedProducts(slug);
+    }
+
 }

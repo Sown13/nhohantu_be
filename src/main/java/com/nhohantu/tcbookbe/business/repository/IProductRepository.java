@@ -37,4 +37,25 @@ public interface IProductRepository extends BaseProductRepository {
     Optional<ProductModel> findBySlug(String slug);
 
     List<ProductModel> findBestProductByOrderByRatingDesc();
+
+    @Query("""
+        SELECT p
+        FROM ProductModel p
+        LEFT JOIN OrderDetailModel od ON od.product = p
+        GROUP BY p
+        ORDER BY COUNT(od.id) DESC
+    """)
+    List<ProductModel> findMostOrderedProducts();
+
+    @Query("""
+        SELECT DISTINCT p
+        FROM ProductModel p
+        JOIN p.productCategories pc
+        JOIN pc.category c
+        WHERE c.id = :categoryId
+    """)
+    List<ProductModel> findProductsByCategoryId(@Param("categoryId") Long categoryId);
+
+    // Related products query
+    List<ProductModel> findDistinctByProductCategories_Category_IdInAndIdNot(List<Long> categoryIds, Long excludeId);
 }
