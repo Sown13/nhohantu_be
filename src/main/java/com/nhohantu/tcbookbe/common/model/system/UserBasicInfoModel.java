@@ -49,4 +49,8 @@ public class UserBasicInfoModel extends BaseModel {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private Set<UserSysRoleModel> userRoles = new HashSet<>();
+
+    @Column(name = "locked", columnDefinition = "BOOLEAN")
+    private boolean locked = false;
+
 }

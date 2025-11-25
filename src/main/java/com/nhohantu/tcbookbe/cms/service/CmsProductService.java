@@ -2,6 +2,7 @@ package com.nhohantu.tcbookbe.cms.service;
 
 import com.nhohantu.tcbookbe.cms.dto.request.CmsCreateProductRequest;
 import com.nhohantu.tcbookbe.cms.dto.response.CmsCreateProductResponse;
+import com.nhohantu.tcbookbe.cms.dto.response.CmsProductPageResponse;
 import com.nhohantu.tcbookbe.cms.repository.ICmsCategoryRepository;
 import com.nhohantu.tcbookbe.cms.repository.ICmsProductCategoryRepository;
 import com.nhohantu.tcbookbe.cms.repository.ICmsProductRepository;
@@ -17,8 +18,13 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import org.springframework.data.domain.Pageable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -222,5 +228,34 @@ public class CmsProductService {
                 .orElseThrow(() -> new RuntimeException("Id not found for delete"));
 
          productRepository.delete(productModel);
+    }
+
+    @Transactional
+    public CmsProductPageResponse getProductsPaginated(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending()); // sắp xếp theo id giảm dần
+        Page<ProductModel> productPage = productRepository.findAll(pageable);
+
+        List<CmsCreateProductResponse> products = productPage.getContent().stream()
+                .map(p -> CmsCreateProductResponse.builder()
+                        .id(p.getId())
+                        .name(p.getName())
+                        .description(p.getDescription())
+                        .price(p.getPrice())
+                        .quantity(p.getQuantity())
+                        .active(p.getActive())
+                        .mainImageUrl(p.getMainImageUrl())
+                        .tagIds(p.getTags().stream().map(TagModel::getId).toList())
+                        .build())
+                .toList();
+
+        CmsProductPageResponse response = new CmsProductPageResponse();
+        response.setContent(products);
+        response.setPageNumber(productPage.getNumber());
+        response.setPageSize(productPage.getSize());
+        response.setTotalElements(productPage.getTotalElements());
+        response.setTotalPages(productPage.getTotalPages());
+        response.setLast(productPage.isLast());
+
+        return response;
     }
 }
