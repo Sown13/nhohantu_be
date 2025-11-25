@@ -265,4 +265,70 @@ public class ProductService {
             return ResponseBuilder.badRequestResponse("ERROR", StatusCodeEnum.ERRORCODE4000);
         }
     }
+
+    public ResponseEntity<ResponseDTO<List<GetProductListResponse>>> getMostOrderedProducts(Integer limit) {
+        try {
+            List<ProductModel> products = productRepository.findMostOrderedProducts()
+                    .stream()
+                    .limit(limit)
+                    .toList();
+
+            List<GetProductListResponse> response = products.stream()
+                    .map(this::mapToProductResponse)
+                    .toList();
+
+            return ResponseBuilder.okResponse(
+                    "SUCCESS",
+                    response,
+                    StatusCodeEnum.SUCCESS2000
+            );
+        } catch (Exception e) {
+            log.error("Error while fetching most ordered products", e);
+            return ResponseBuilder.badRequestResponse("ERROR", StatusCodeEnum.ERRORCODE4000);
+        }
+    }
+
+    public ResponseEntity<ResponseDTO<List<GetProductListResponse>>> getRelatedProducts(String slug) {
+        try {
+            // 1. Get the product by slug
+            Optional<ProductModel> productOpt = productRepository.findBySlug(slug);
+            if (productOpt.isEmpty()) {
+                return ResponseBuilder.badRequestResponse("Product not found", StatusCodeEnum.EXCEPTION0404);
+            }
+
+            ProductModel product = productOpt.get();
+
+            // 2. Get category IDs of the product
+            List<Long> categoryIds = product.getProductCategories().stream()
+                    .map(pc -> pc.getCategory().getId())
+                    .toList();
+
+            if (categoryIds.isEmpty()) {
+                // If no categories, return empty list
+                return ResponseBuilder.okResponse(
+                        "SUCCESS",
+                        new ArrayList<>(),
+                        StatusCodeEnum.SUCCESS2000
+                );
+            }
+
+            // 3. Find related products that share the same categories, excluding current product
+            List<ProductModel> relatedProducts = productRepository.findDistinctByProductCategories_Category_IdInAndIdNot(
+                    categoryIds,
+                    product.getId()
+            );
+
+            // 4. Map to DTO
+            List<GetProductListResponse> response = relatedProducts.stream()
+                    .map(this::mapToProductResponse)
+                    .toList();
+
+            return ResponseBuilder.okResponse("SUCCESS", response, StatusCodeEnum.SUCCESS2000);
+
+        } catch (Exception e) {
+            log.error("Error while fetching related products for slug: {}", slug, e);
+            return ResponseBuilder.badRequestResponse("ERROR", StatusCodeEnum.ERRORCODE4000);
+        }
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.nhohantu.tcbookbe.cms.dto.response;
 
+import com.nhohantu.tcbookbe.business.dto.response.GetProductListResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,4 +21,7 @@ public class CmsListCategoryResponse {
     private Integer categoryLevel;
     private Long productCount; // optional
     private List<CmsListCategoryResponse> children;
+
+    // 👇 add this field for your use case
+    private List<GetProductListResponse> products;
 }
