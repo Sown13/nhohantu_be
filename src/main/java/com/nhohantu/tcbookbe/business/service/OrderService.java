@@ -50,7 +50,7 @@ public class OrderService {
             // Tạo đơn hàng mới
             OrderModel order = OrderModel.builder()
                     .user(userBasicInfoModel)
-                    .status(request.getPaymentStatus())
+//                    .status(request.getPaymentStatus())
                     .totalPrice(request.getTotal())
                     .build();
 
