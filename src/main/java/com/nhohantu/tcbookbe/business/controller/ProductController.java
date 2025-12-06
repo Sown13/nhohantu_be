@@ -2,17 +2,16 @@ package com.nhohantu.tcbookbe.business.controller;
 
 import com.nhohantu.tcbookbe.business.dto.response.GetProductDetailResponse;
 import com.nhohantu.tcbookbe.business.dto.response.GetProductListResponse;
+import com.nhohantu.tcbookbe.business.dto.response.ProductDetailResponse;
 import com.nhohantu.tcbookbe.business.service.ProductService;
 import com.nhohantu.tcbookbe.common.model.builder.ResponseDTO;
-import com.nhohantu.tcbookbe.business.repository.ProductRepository;
-import com.nhohantu.tcbookbe.common.model.entity.ProductModel;
-import jakarta.persistence.Id;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/products")
@@ -31,24 +30,29 @@ public class ProductController {
         return productService.getProducts(pageNumber, pageSize, sortBy, sortDirection);
     }
 
-    private final ProductService productService;
     @GetMapping("/{id}")
-    public ProductModel getProductById(@PathVariable Long id){
-        return productService.findById(id);
+    public ResponseEntity<ResponseDTO<GetProductDetailResponse>> getProductDetail(@PathVariable("id") Long id) {
+        return productService.getProductDetailById(id);
     }
 
-    @PostMapping ("/add")
-    public ProductModel addProduct(@RequestBody ProductModel product){
-        return productService.addProduct(product);
+    @GetMapping("/{slug}")
+    public ResponseEntity<ResponseDTO<ProductDetailResponse>> getProductDetail(@PathVariable String slug) {
+        return productService.getProductBySlug(slug);
     }
 
-    @PutMapping("/update")
-    public ProductModel updateProduct(@RequestBody ProductModel product){
-        return productService.updateProduct(product);
-    }
-
-    @DeleteMapping("/delete")
-    public ProductModel deleteProduct(@RequestParam long id){
-        return productService.deleteProduct(id);
+    @GetMapping("/search")
+    public ResponseEntity<ResponseDTO<List<GetProductListResponse>>> searchProducts(
+            @RequestParam(value = "text", required = false) String text,
+            @RequestParam(value = "category", required = false) String category,
+            @RequestParam(value = "active", required = false) Boolean active,
+            @RequestParam(value = "price_min", required = false) BigDecimal priceMin,
+            @RequestParam(value = "price_max", required = false) BigDecimal priceMax,
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "limit", defaultValue = "10") Integer limit,
+            @RequestParam(value = "sort_by", defaultValue = "id_asc") String sortBy
+    ) {
+        return productService.searchProducts(
+                text, category, active, priceMin, priceMax, page, limit, sortBy
+        );
     }
 }

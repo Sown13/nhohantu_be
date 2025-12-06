@@ -1,11 +1,17 @@
 package com.nhohantu.tcbookbe.common.model.entity;
 
 import com.nhohantu.tcbookbe.common.model.base.entity.BaseModel;
+import com.nhohantu.tcbookbe.common.model.enums.OrderStatus;
 import com.nhohantu.tcbookbe.common.model.system.UserBasicInfoModel;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = false)
 @Data
@@ -22,5 +28,10 @@ public class OrderModel extends BaseModel {
 
     private BigDecimal totalPrice;
 
-    private String status;//todo chắc đổi qua enum
+    @Enumerated(EnumType.STRING)
+    @Column(length = 30)
+    private OrderStatus status;//todo chắc đổi qua enum
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<OrderDetailModel> orderDetails;
 }
