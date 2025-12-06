@@ -17,7 +17,7 @@ import java.util.List;
 public class CmsCreateProductResponse {
     private Long id;
     private String name;
-    private String desciption;
+    private String description;
     private String coverUrl;
     private BigDecimal price;
     private Integer quantity;
