@@ -57,4 +57,45 @@ public class CmsProductController {
     }
 
     // TODO: update, delete
+    @PutMapping("/{id}")
+    public ResponseEntity<ResponseDTO<CmsCreateProductResponse>> updateProduct(
+            @PathVariable Long id,
+            @RequestBody CmsCreateProductRequest request) {
+
+        CmsCreateProductResponse updatedProduct = productService.updateProduct(id, request);
+
+        ResponseDTO<CmsCreateProductResponse> response = ResponseDTO.<CmsCreateProductResponse>builder()
+                .success(true)
+                .message("Product updated successfully")
+                .data(updatedProduct)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseDTO<Void>> deleteProduct(@PathVariable Long id) {
+        productService.deleteProduct(id);
+
+        ResponseDTO<Void> response = ResponseDTO.<Void>builder()
+                .success(true)
+                .message("Product deleted successfully")
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/get/{id}")
+    public ResponseEntity<ResponseDTO<CmsGetProductDetailResponse>> getProductDetail(@PathVariable Long id) {
+        CmsGetProductDetailResponse response = getproductDetailService.getProductDetailById(id);
+
+        ResponseDTO<CmsGetProductDetailResponse> responseDTO = ResponseDTO.<CmsGetProductDetailResponse>builder()
+                .success(true)
+                .message("Success")
+                .data(response)
+                .build();
+
+        return ResponseEntity.ok(responseDTO);
+    }
+
 }
