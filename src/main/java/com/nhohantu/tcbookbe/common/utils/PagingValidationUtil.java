@@ -86,5 +86,18 @@ public class PagingValidationUtil {
 
         return PageRequest.of(springPage, size, sort);
     }
+
+    public Sort parseSort(String sortBy) {
+        if (sortBy == null || sortBy.isEmpty()) return Sort.by("id").ascending();
+
+        String[] parts = sortBy.split("_");
+        if (parts.length != 2) return Sort.by("id").ascending();
+
+        String field = parts[0];
+        String direction = parts[1];
+
+        return direction.equalsIgnoreCase("desc") ? Sort.by(field).descending() : Sort.by(field).ascending();
+    }
+
 }
 

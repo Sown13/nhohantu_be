@@ -64,9 +64,15 @@ public class AuthenticationService {
 
         String jwtToken = jwtService.generateToken(authenticatedUser);
 
+        UserBasicInfoModel user = authenticatedUser.getUser();
+
         LoginResponse loginResponse = LoginResponse.builder()
                 .token(jwtToken)
                 .expiresIn(jwtService.getExpirationTime())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .first_name(user.getFirstName())
+                .last_name(user.getLastName())
                 .build();
 
         return ResponseBuilder.okResponse("Login successfully", loginResponse, StatusCodeEnum.SUCCESS2000);
