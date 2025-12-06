@@ -20,7 +20,7 @@ public class CategoryModel extends BaseModel {
     @Column(name = "name", nullable = false, length = 255)
     private String name; // Tên danh mục
 
-    @Column(name = "slug", nullable = false, unique = true, length = 255)
+    @Column(name = "slug", unique = true, length = 255)
     private String slug; // slug thân thiện cho URL
 
     @Column(name = "image_url")
