@@ -63,7 +63,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return !user.isLocked();
+        return !user.getLocked();
     }
 
     @Override

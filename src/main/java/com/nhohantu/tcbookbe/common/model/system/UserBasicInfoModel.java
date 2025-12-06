@@ -51,6 +51,6 @@ public class UserBasicInfoModel extends BaseModel {
     private Set<UserSysRoleModel> userRoles = new HashSet<>();
 
     @Column(name = "locked", columnDefinition = "BOOLEAN")
-    private boolean locked = false;
+    private Boolean locked = false;
 
 }

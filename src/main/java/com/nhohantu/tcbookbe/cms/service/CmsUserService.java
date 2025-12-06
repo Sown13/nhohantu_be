@@ -26,7 +26,7 @@ public class CmsUserService {
         res.setPrimaryPhone(user.getPrimaryPhone());
         res.setEmail(user.getEmail());
         res.setAddress(user.getAddress());
-        res.setLocked(user.isLocked());
+        res.setLocked(user.getLocked());
         return res;
     }
 
