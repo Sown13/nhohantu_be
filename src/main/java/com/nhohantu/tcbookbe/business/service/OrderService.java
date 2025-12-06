@@ -41,9 +41,9 @@ public class OrderService {
             //ấy user đang đăng nhập
             UserBasicInfoModel userBasicInfoModel = userBasicInfoService.getUserInfoFromContext();
             if (userBasicInfoModel == null) {
-                return ResponseBuilder.badRequestResponse(
-                        "Không tìm thấy thông tin user đang đăng nhập",
-                        StatusCodeEnum.ERRORCODE4000
+                return ResponseBuilder.unauthorizedResponse(
+                        "Token hết hạn hoặc không hợp lệ – vui lòng đăng nhập lại",
+                        StatusCodeEnum.ERRORCODE4010
                 );
             }
 

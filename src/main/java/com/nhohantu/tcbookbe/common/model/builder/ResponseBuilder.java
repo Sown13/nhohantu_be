@@ -121,4 +121,13 @@ public class ResponseBuilder {
                 .build();
         return ResponseEntity.ok(dto);
     }
+
+    public static <T> ResponseEntity<ResponseDTO<T>> unauthorizedResponse(String message, StatusCodeEnum statusCode) {
+        final ResponseDTO<T> dto = ResponseDTO.<T>builder()
+                .success(false)
+                .message(message)
+                .statusCode(statusCode.toString())
+                .build();
+        return ResponseEntity.status(401).body(dto);
+    }
 }
