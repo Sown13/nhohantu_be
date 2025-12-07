@@ -18,6 +18,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -218,24 +219,89 @@ public class CmsCategoryService {
                 .build();
     }
 
-    public ResponseEntity<ResponseDTO<List<GetProductListResponse>>> getProductsByCategorySlug(String slug) {
+    public List<Long> getAllCategoryIds(CategoryModel category) {
+        List<Long> ids = new ArrayList<>();
+        ids.add(category.getId());
+
+        if (category.getChildCategories() != null) {
+            for (CategoryModel child : category.getChildCategories()) {
+                ids.addAll(getAllCategoryIds(child));
+            }
+        }
+
+        return ids;
+    }
+
+    public ResponseEntity<ResponseDTO<List<GetProductListResponse>>> getProductsByCategorySlug(
+            String slug,
+            String sortBy,
+            Integer min,
+            Integer max,
+            Boolean onSale
+    ) {
         // 1. Find category by slug
         Optional<CategoryModel> categoryOpt = categoryService.findBySlug(slug);
         if (categoryOpt.isEmpty()) {
             return ResponseBuilder.badRequestResponse("Category not found", StatusCodeEnum.EXCEPTION0404);
         }
-
         CategoryModel category = categoryOpt.get();
 
-        // 2. Find all products in this category
-        List<ProductModel> products = productRepository.findProductsByCategoryId(category.getId());
+        // 2. Get all category IDs (parent + children)
+        List<Long> categoryIds = getAllCategoryIds(category);
 
-        // 3. Map to DTO
-        List<GetProductListResponse> response = products.stream()
-                .map(product -> mapper.map(product, GetProductListResponse.class))
+        // 3. Fetch products
+        List<ProductModel> products = productRepository.findProductsByCategoryIds(categoryIds);
+
+        if (products == null) products = new ArrayList<>();
+
+        // 4. Set default filter values
+        int minPrice = (min != null) ? min : 0;
+        int maxPrice = (max != null) ? max : 50000;
+        boolean filterOnSale = (onSale != null) ? onSale : false;
+        String sortOption = (sortBy != null) ? sortBy : "new-arrival";
+
+        // 5. Filter products
+        List<ProductModel> filteredProducts = products.stream()
+                .filter(p -> {
+                    BigDecimal effectivePrice = (p.getSalePrice() != null && p.getSalePrice().compareTo(BigDecimal.ZERO) > 0)
+                            ? p.getSalePrice()
+                            : p.getPrice();
+                    return effectivePrice.compareTo(BigDecimal.valueOf(minPrice)) >= 0 &&
+                            effectivePrice.compareTo(BigDecimal.valueOf(maxPrice)) <= 0;
+                })
+                .filter(p -> !filterOnSale || (p.getSalePrice() != null && p.getSalePrice().compareTo(p.getPrice()) < 0))
+                .toList();
+
+        // 6. Sort products
+        List<ProductModel> sortedProducts = switch (sortOption) {
+            case "lowest" -> filteredProducts.stream()
+                    .sorted(Comparator.comparing(p -> (p.getSalePrice() != null && p.getSalePrice().compareTo(BigDecimal.ZERO) > 0)
+                            ? p.getSalePrice()
+                            : p.getPrice()))
+                    .toList();
+            case "highest" -> filteredProducts.stream()
+                    .sorted(Comparator.comparing((ProductModel p) ->
+                            (p.getSalePrice() != null && p.getSalePrice().compareTo(BigDecimal.ZERO) > 0)
+                                    ? p.getSalePrice()
+                                    : p.getPrice()
+                    ).reversed())
+                    .toList();
+            case "best-selling" -> filteredProducts.stream()
+                    .sorted(Comparator.comparing(ProductModel::getSold).reversed())
+                    .toList();
+            case "new-arrival" -> filteredProducts.stream()
+                    .sorted(Comparator.comparing(ProductModel::getCreatedAt).reversed())
+                    .toList();
+            default -> filteredProducts;
+        };
+
+        // 7. Map to DTO
+        List<GetProductListResponse> response = sortedProducts.stream()
+                .map(this::mapToProductResponse)
                 .toList();
 
         return ResponseBuilder.okResponse("SUCCESS", response, StatusCodeEnum.SUCCESS2000);
     }
+
 }
 
