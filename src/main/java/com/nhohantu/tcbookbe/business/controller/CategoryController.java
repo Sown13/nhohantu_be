@@ -7,9 +7,12 @@ import com.nhohantu.tcbookbe.cms.service.CmsCategoryService;
 import com.nhohantu.tcbookbe.common.model.builder.ResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("/category")
@@ -33,13 +36,7 @@ public class CategoryController {
     }
 
     @GetMapping("/{slug}/products")
-    public ResponseEntity<ResponseDTO<List<GetProductListResponse>>> getProductsByCategory(
-            @PathVariable String slug,
-            @RequestParam(required = false) String sort_by,
-            @RequestParam(required = false) Integer min,
-            @RequestParam(required = false) Integer max,
-            @RequestParam(required = false) Boolean on_sale
-    ) {
-        return categoryService.getProductsByCategorySlug(slug, sort_by, min, max, on_sale);
+    public ResponseEntity<ResponseDTO<List<GetProductListResponse>>> getProductsByCategory(@PathVariable String slug) {
+        return categoryService.getProductsByCategorySlug(slug);
     }
 }

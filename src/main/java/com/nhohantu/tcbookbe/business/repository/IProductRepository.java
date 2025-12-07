@@ -58,13 +58,4 @@ public interface IProductRepository extends BaseProductRepository {
 
     // Related products query
     List<ProductModel> findDistinctByProductCategories_Category_IdInAndIdNot(List<Long> categoryIds, Long excludeId);
-
-    @Query("""
-        SELECT DISTINCT p
-        FROM ProductModel p
-        JOIN p.productCategories pc
-        JOIN pc.category c
-        WHERE c.id IN :categoryIds
-    """)
-    List<ProductModel> findProductsByCategoryIds(@Param("categoryIds") List<Long> categoryIds);
 }

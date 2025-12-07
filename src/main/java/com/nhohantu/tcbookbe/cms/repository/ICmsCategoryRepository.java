@@ -12,4 +12,5 @@ public interface ICmsCategoryRepository extends BaseCategoryRepository {
     List<CategoryModel> findByCategoryLevel(Integer categoryLevel);
     List<CategoryModel> findAll();
     Optional<CategoryModel> findBySlug(String slug);
+    List<CategoryModel> findAllByCategoryLevel(Integer categoryLevel);
 }
