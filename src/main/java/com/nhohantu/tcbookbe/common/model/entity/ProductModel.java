@@ -77,6 +77,14 @@ public class ProductModel extends BaseModel {
     @Convert(converter = JsonConverter.class)
     private Map<String, Object> variations;
 
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public BigDecimal getSalePrice() {
+        return salePrice;
+    }
+    
     // --- Relationships ---
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
