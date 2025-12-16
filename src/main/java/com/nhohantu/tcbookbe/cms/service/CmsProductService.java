@@ -117,7 +117,7 @@ public class CmsProductService {
             product.setTags(tags);
         }
 
-        product.setSlug("");
+        // product.setSlug("");
 
         try {
             ProductModel result = productRepository.save(product);
