@@ -10,6 +10,7 @@ import com.nhohantu.tcbookbe.common.model.builder.ResponseDTO;
 import com.nhohantu.tcbookbe.common.model.entity.OrderDetailModel;
 import com.nhohantu.tcbookbe.common.model.entity.OrderModel;
 import com.nhohantu.tcbookbe.common.model.entity.ProductModel;
+import com.nhohantu.tcbookbe.common.model.enums.OrderStatus;
 import com.nhohantu.tcbookbe.common.model.enums.StatusCodeEnum;
 import com.nhohantu.tcbookbe.common.model.system.UserBasicInfoModel;
 import com.nhohantu.tcbookbe.common.service.UserBasicInfoService;
@@ -50,7 +51,7 @@ public class OrderService {
             //Tạo đơn hàng mới
             OrderModel order = OrderModel.builder()
                     .user(userBasicInfoModel)
-//                    .status(request.getPaymentStatus())
+                    .status(OrderStatus.PENDING)
                     .totalPrice(request.getTotal())
                     .build();
 
@@ -124,7 +125,6 @@ public class OrderService {
 
         OrderModel order = orderOpt.get();
 
-        // ép load chi tiết (vì LAZY)
         order.getOrderDetails().size();
 
         OrderResponse response = modelMapper.map(order, OrderResponse.class);

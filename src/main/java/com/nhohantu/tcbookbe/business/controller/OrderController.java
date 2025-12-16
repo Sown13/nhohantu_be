@@ -1,17 +1,15 @@
 package com.nhohantu.tcbookbe.business.controller;
 
 import com.nhohantu.tcbookbe.business.dto.request.OrderCreateRequest;
+import com.nhohantu.tcbookbe.business.dto.request.PayOrderRequest;
 import com.nhohantu.tcbookbe.business.dto.response.OrderResponse;
+import com.nhohantu.tcbookbe.business.dto.response.PayOrderResponse;
 import com.nhohantu.tcbookbe.business.service.OrderService;
+import com.nhohantu.tcbookbe.business.service.PaymentService;
 import com.nhohantu.tcbookbe.common.model.builder.ResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,6 +19,7 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+    private final PaymentService paymentService;
 
     @PostMapping("/make-order")
     public ResponseEntity<ResponseDTO<OrderResponse>> createOrder(@RequestBody OrderCreateRequest request) {
@@ -37,5 +36,10 @@ public class OrderController {
     @GetMapping("/{id}")
     public ResponseEntity<ResponseDTO<OrderResponse>> getOrderById(@PathVariable Long id) {
         return orderService.getOrderById(id);
+    }
+
+    @PostMapping("/payment")
+    public ResponseEntity<ResponseDTO<PayOrderResponse>> doPayOrder(@RequestBody PayOrderRequest request) {
+        return paymentService.payOrder(request);
     }
 }
