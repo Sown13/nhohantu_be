@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data // Sử dụng Lombok để tự động generate getter/setter
+@Data
 public class CmsOrderResponse {
     private Long orderId;
     private String username;

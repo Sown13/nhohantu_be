@@ -80,7 +80,6 @@ public class OrderService {
                         .quantity(item.getQuantity())
                         .build();
             }).collect(Collectors.toList());
-
             orderDetailRepository.saveAll(details);
 
             //Map sang DTO để trả về
