@@ -20,6 +20,7 @@ public class CmsCreateProductResponse {
     private String description;
     private String coverUrl;
     private BigDecimal price;
+    private String slug;
     private Integer quantity;
     private Boolean active;
     private String mainImageUrl;

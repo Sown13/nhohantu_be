@@ -13,6 +13,7 @@ public class CmsCreateProductRequest {
     private String name;
     private String description;
     private BigDecimal price;
+    private String slug;
     private BigDecimal salePrice;
     private Integer quantity;
     private Boolean active;
