@@ -125,7 +125,6 @@ public class OrderService {
 
         OrderModel order = orderOpt.get();
 
-        // ép load chi tiết (vì LAZY)
         order.getOrderDetails().size();
 
         OrderResponse response = modelMapper.map(order, OrderResponse.class);
