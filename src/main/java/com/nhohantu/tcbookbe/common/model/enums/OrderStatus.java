@@ -16,4 +16,13 @@ public enum OrderStatus {
     public String getDescription() {
         return description;
     }
+
+    public static OrderStatus fromName(String name) {
+        if (name == null) {
+            System.out.println("OrderStatus name is null");
+            return PENDING;
+        }
+
+        return OrderStatus.valueOf(name.toUpperCase());
+    }
 }

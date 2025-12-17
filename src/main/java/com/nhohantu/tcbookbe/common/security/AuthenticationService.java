@@ -37,6 +37,7 @@ public class AuthenticationService {
                 .email(request.getEmail())
                 .primaryPhone(request.getPhone())
 //                .createdBy(userBasicInfoModel.getId())
+                .locked(false)
                 .build();
 
         return new UserDetailsImpl(userRepository.save(user));
