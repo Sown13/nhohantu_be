@@ -69,4 +69,11 @@ public class ProductController {
         return productService.getRelatedProducts(slug);
     }
 
+    @GetMapping("/search-products")
+    public ResponseEntity<ResponseDTO<List<GetProductListResponse>>> searchProducts(
+            @RequestParam(name = "text") String text
+    ) {
+        // Simply delegate to the service
+        return productService.clientSearchProducts(text);
+    }
 }

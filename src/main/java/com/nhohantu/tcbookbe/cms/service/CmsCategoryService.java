@@ -19,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -209,6 +211,7 @@ public class CmsCategoryService {
                 .slug(product.getSlug())
                 .description(product.getDescription())
                 .price(product.getPrice())
+                .mainImageUrl(product.getMainImageUrl())
                 .salePrice(product.getSalePrice())
                 .brand(product.getBrand())
                 .rating(product.getRating())
@@ -251,7 +254,6 @@ public class CmsCategoryService {
 
         // 3. Fetch products
         List<ProductModel> products = productRepository.findProductsByCategoryIds(categoryIds);
-
         if (products == null) products = new ArrayList<>();
 
         // 4. Set default filter values
@@ -263,35 +265,43 @@ public class CmsCategoryService {
         // 5. Filter products
         List<ProductModel> filteredProducts = products.stream()
                 .filter(p -> {
-                    BigDecimal effectivePrice = (p.getSalePrice() != null && p.getSalePrice().compareTo(BigDecimal.ZERO) > 0)
-                            ? p.getSalePrice()
-                            : p.getPrice();
+                    BigDecimal effectivePrice = getEffectivePrice(p);
                     return effectivePrice.compareTo(BigDecimal.valueOf(minPrice)) >= 0 &&
                             effectivePrice.compareTo(BigDecimal.valueOf(maxPrice)) <= 0;
                 })
                 .filter(p -> !filterOnSale || (p.getSalePrice() != null && p.getSalePrice().compareTo(p.getPrice()) < 0))
                 .toList();
 
-        // 6. Sort products
+        // 6. Sort products (null-safe)
         List<ProductModel> sortedProducts = switch (sortOption) {
             case "lowest" -> filteredProducts.stream()
-                    .sorted(Comparator.comparing(p -> (p.getSalePrice() != null && p.getSalePrice().compareTo(BigDecimal.ZERO) > 0)
-                            ? p.getSalePrice()
-                            : p.getPrice()))
+                    .sorted(Comparator.comparing(
+                            IProductRepository::getEffectivePrice,
+                            Comparator.nullsLast(Comparator.naturalOrder())
+                    ))
                     .toList();
+
             case "highest" -> filteredProducts.stream()
-                    .sorted(Comparator.comparing((ProductModel p) ->
-                            (p.getSalePrice() != null && p.getSalePrice().compareTo(BigDecimal.ZERO) > 0)
-                                    ? p.getSalePrice()
-                                    : p.getPrice()
+                    .sorted(Comparator.comparing(
+                            IProductRepository::getEffectivePrice,
+                            Comparator.nullsLast(Comparator.naturalOrder())
                     ).reversed())
                     .toList();
+
             case "best-selling" -> filteredProducts.stream()
-                    .sorted(Comparator.comparing(ProductModel::getSold).reversed())
+                    .sorted(Comparator.comparing(
+                            p -> p.getSold() != null ? p.getSold() : 0,
+                            Comparator.reverseOrder()
+                    ))
                     .toList();
+
             case "new-arrival" -> filteredProducts.stream()
-                    .sorted(Comparator.comparing(ProductModel::getCreatedAt).reversed())
+                    .sorted(Comparator.comparing(
+                            p -> p.getCreatedAt() != null ? p.getCreatedAt() : LocalDateTime.of(1970, 1, 1, 0, 0),
+                            Comparator.reverseOrder()
+                    ))
                     .toList();
+
             default -> filteredProducts;
         };
 
@@ -301,6 +311,15 @@ public class CmsCategoryService {
                 .toList();
 
         return ResponseBuilder.okResponse("SUCCESS", response, StatusCodeEnum.SUCCESS2000);
+    }
+
+    // --- Helper method ---
+    private static BigDecimal getEffectivePrice(ProductModel product) {
+        if (product == null) return BigDecimal.ZERO;
+        if (product.getSalePrice() != null && product.getSalePrice().compareTo(BigDecimal.ZERO) > 0) {
+            return product.getSalePrice();
+        }
+        return product.getPrice() != null ? product.getPrice() : BigDecimal.ZERO;
     }
 
 }
