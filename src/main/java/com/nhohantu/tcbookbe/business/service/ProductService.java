@@ -135,20 +135,6 @@ public class ProductService {
 
         ProductModel product = productOpt.get();
 
-        // Map image chính
-        AttachmentResponse mainImage = null;
-        if (product.getProductImages() != null && !product.getProductImages().isEmpty()) {
-            Optional<ProductImageModel> primary = product.getProductImages().stream()
-                    .filter(ProductImageModel::isPrimary)
-                    .findFirst();
-            if (primary.isPresent()) {
-                mainImage = new AttachmentResponse(primary.get().getImageUrl(), primary.get().getDescription());
-            } else {
-                mainImage = new AttachmentResponse(product.getMainImageUrl(), null);
-            }
-        } else {
-            mainImage = new AttachmentResponse(product.getMainImageUrl(), null);
-        }
 
         // Map gallery
         List<AttachmentResponse> gallery = product.getProductImages().stream()
@@ -180,7 +166,7 @@ public class ProductService {
         response.setSalePrice(product.getSalePrice());
         response.setMinPrice(product.getPrice()); // có thể tính min/max từ biến thể nếu có
         response.setMaxPrice(product.getPrice());
-        response.setImage(mainImage);
+        response.setMainImageUrl(product.getMainImageUrl());
         response.setGallery(gallery);
         response.setCategory(category);
         response.setTag(tags);
@@ -225,7 +211,7 @@ public class ProductService {
                 .salePrice(null) // placeholder
                 .minPrice(null)
                 .maxPrice(null)
-                .mainImage(AttachmentResponse.builder().url(product.getMainImageUrl()).build())
+                .mainImageUrl(product.getMainImageUrl())
                 .sku(null) // placeholder
                 .gallery(gallery)
                 .category(category)
@@ -331,4 +317,30 @@ public class ProductService {
         }
     }
 
+    public ResponseEntity<ResponseDTO<List<GetProductListResponse>>> clientSearchProducts(String text) {
+        try {
+            List<ProductModel> products = productRepository.clientSearchProducts(text);
+
+            List<GetProductListResponse> response = products.stream()
+                    .map(product -> GetProductListResponse.builder()
+                            .id(product.getId())
+                            .name(product.getName())
+                            .slug(product.getSlug())
+                            .mainImageUrl(product.getMainImageUrl())
+                            .build())
+                    .toList();
+
+            return ResponseBuilder.okResponse(
+                    "Products fetched successfully",
+                    response,
+                    StatusCodeEnum.SUCCESS2000
+            );
+        } catch (Exception e) {
+            log.error("Error while searching products", e);
+            return ResponseBuilder.badRequestResponse(
+                    "Error fetching products",
+                    StatusCodeEnum.ERRORCODE4000
+            );
+        }
+    }
 }

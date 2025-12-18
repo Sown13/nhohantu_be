@@ -67,4 +67,16 @@ public interface IProductRepository extends BaseProductRepository {
         WHERE c.id IN :categoryIds
     """)
     List<ProductModel> findProductsByCategoryIds(@Param("categoryIds") List<Long> categoryIds);
+
+    static BigDecimal getEffectivePrice(ProductModel product) {
+        if (product == null) return BigDecimal.ZERO;
+        return product.getPrice() != null ? product.getPrice() : BigDecimal.ZERO;
+    }
+
+    @Query("""
+        SELECT DISTINCT p
+        FROM ProductModel p
+        WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :text, '%'))
+    """)
+    List<ProductModel> clientSearchProducts(@Param("text") String text);
 }
