@@ -25,6 +25,7 @@ public class GetProductListResponse {
     private BigDecimal salePrice;
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
+    private String mainImageUrl;
     private AttachmentResponse mainImage;
     private String sku;
     private List<AttachmentResponse> gallery;
