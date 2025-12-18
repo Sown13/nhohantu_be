@@ -136,6 +136,12 @@
             <version>2.20.0</version>
         </dependency>
 
+        <!--email-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -147,6 +153,7 @@
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
+                            <version>1.18.38</version>
                             <artifactId>lombok</artifactId>
                         </path>
                     </annotationProcessorPaths>
