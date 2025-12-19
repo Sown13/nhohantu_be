@@ -3,11 +3,7 @@ package com.nhohantu.tcbookbe.common.utils;
 import lombok.experimental.UtilityClass;
 
 import java.security.SecureRandom;
-import java.util.Base64;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @UtilityClass
 public class Util {
@@ -69,5 +65,12 @@ public class Util {
         return uniqueSet.stream().toList();
     }
 
-
+    public static String generateSlug(String input) {
+        if (input == null) return null;
+        return input
+                .toLowerCase(Locale.ROOT)
+                .trim()
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("^-|-$", "");
+    }
 }

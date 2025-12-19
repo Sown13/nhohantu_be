@@ -14,6 +14,7 @@ import com.nhohantu.tcbookbe.common.model.entity.TagModel;
 import com.nhohantu.tcbookbe.common.model.enums.StatusCodeEnum;
 import com.nhohantu.tcbookbe.common.service.UserBasicInfoService;
 import com.nhohantu.tcbookbe.common.utils.Constant;
+import com.nhohantu.tcbookbe.common.utils.Util;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -61,7 +62,7 @@ public class CmsProductService {
         }
 
         // Generate slug từ tên
-        String slug = generateSlug(request.getName());
+        String slug = Util.generateSlug(request.getName());
 
         // Build product
         ProductModel product = ProductModel.builder()
