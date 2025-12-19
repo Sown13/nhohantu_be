@@ -6,12 +6,12 @@ import com.nhohantu.tcbookbe.cms.dto.request.CmsCreateCategoryRequest;
 import com.nhohantu.tcbookbe.cms.dto.response.CmsCreateCategoryResponse;
 import com.nhohantu.tcbookbe.cms.dto.response.CmsListCategoryResponse;
 import com.nhohantu.tcbookbe.cms.repository.ICmsCategoryRepository;
-import com.nhohantu.tcbookbe.cms.repository.ICmsProductRepository;
 import com.nhohantu.tcbookbe.common.model.builder.ResponseBuilder;
 import com.nhohantu.tcbookbe.common.model.builder.ResponseDTO;
 import com.nhohantu.tcbookbe.common.model.entity.CategoryModel;
 import com.nhohantu.tcbookbe.common.model.entity.ProductModel;
 import com.nhohantu.tcbookbe.common.model.enums.StatusCodeEnum;
+import com.nhohantu.tcbookbe.common.utils.Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -19,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,7 +27,7 @@ import java.util.stream.Collectors;
 @Log4j2
 @RequiredArgsConstructor
 public class CmsCategoryService {
-    private final ICmsCategoryRepository categoryService;
+    private final ICmsCategoryRepository categoryRepository;
     private final ModelMapper mapper;
     private final IProductRepository productRepository;
 
@@ -58,7 +57,7 @@ public class CmsCategoryService {
             Integer categoryLevel = request.getCategoryLevel();
 
             if (request.getParentId() != null) {
-                Optional<CategoryModel> parentOptional = categoryService.findById(request.getParentId());
+                Optional<CategoryModel> parentOptional = categoryRepository.findById(request.getParentId());
                 if (parentOptional.isEmpty()) {
                     return ResponseBuilder.badRequestResponse("Danh mục cha không tồn tại", StatusCodeEnum.ERRORCODE4000);
                 }
@@ -72,9 +71,22 @@ public class CmsCategoryService {
                 }
             }
 
-            CategoryModel category = CategoryModel.builder().name(request.getName()).parentCategory(parentCategory).categoryLevel(categoryLevel).build();
+            String slug = Util.generateSlug(request.getName());
 
-            CategoryModel result = categoryService.save(category);
+            //check trùng slug
+            if (existsBySlugAndLevel(slug, categoryLevel)) {
+                return ResponseBuilder.badRequestResponse(
+                        "Slug danh mục đã tồn tại",
+                        StatusCodeEnum.ERRORCODE4000
+                );
+            }
+            CategoryModel category = CategoryModel.builder()
+                    .name(request.getName())
+                    .parentCategory(parentCategory)
+                    .slug(slug)
+                    .categoryLevel(categoryLevel).build();
+
+            CategoryModel result = categoryRepository.save(category);
             CmsCreateCategoryResponse response = mapper.map(result, CmsCreateCategoryResponse.class);
 
             return ResponseBuilder.okResponse("Tạo danh mục thành công", response, StatusCodeEnum.SUCCESS2000);
@@ -89,7 +101,7 @@ public class CmsCategoryService {
 
     public ResponseEntity<ResponseDTO<List<CmsCreateCategoryResponse>>> findAllCategoryLevel3() {
         try {
-            List<CategoryModel> categories = categoryService.findByCategoryLevel(3);
+            List<CategoryModel> categories = categoryRepository.findByCategoryLevel(3);
 
             List<CmsCreateCategoryResponse> responseList = categories.stream().map(category -> mapper.map(category, CmsCreateCategoryResponse.class)).collect(Collectors.toList());
 
@@ -103,7 +115,7 @@ public class CmsCategoryService {
 
     public ResponseEntity<ResponseDTO<List<CmsListCategoryResponse>>> findAllCategory() {
         try {
-            List<CategoryModel> allCategories = categoryService.findAll();
+            List<CategoryModel> allCategories = categoryRepository.findAll();
 
             Map<Long, CmsListCategoryResponse> categoryMap = allCategories.stream()
                     .map(category -> {
@@ -149,7 +161,7 @@ public class CmsCategoryService {
     public ResponseEntity<ResponseDTO<List<CmsListCategoryResponse>>> findCategoryProducts() {
         try {
             List<CategoryModel> allCategories = new ArrayList<>(
-                    categoryService.findAll().stream()
+                    categoryRepository.findAll().stream()
                             .filter(c -> c.getCategoryLevel() != null)
                             .toList()
             );
@@ -243,7 +255,7 @@ public class CmsCategoryService {
             Boolean onSale
     ) {
         // 1. Find category by slug
-        Optional<CategoryModel> categoryOpt = categoryService.findBySlug(slug);
+        Optional<CategoryModel> categoryOpt = categoryRepository.findBySlug(slug);
         if (categoryOpt.isEmpty()) {
             return ResponseBuilder.badRequestResponse("Category not found", StatusCodeEnum.EXCEPTION0404);
         }
@@ -322,5 +334,8 @@ public class CmsCategoryService {
         return product.getPrice() != null ? product.getPrice() : BigDecimal.ZERO;
     }
 
+    public boolean existsBySlugAndLevel(String slug, Integer level) {
+        return categoryRepository.existsBySlugAndCategoryLevel(slug, level);
+    }
 }
 
