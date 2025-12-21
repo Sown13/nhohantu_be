@@ -1,6 +1,7 @@
 package com.nhohantu.tcbookbe.cms.controller;
 
 import com.nhohantu.tcbookbe.cms.dto.request.CmsCreateCategoryRequest;
+import com.nhohantu.tcbookbe.cms.dto.request.CmsUpdateCategoryRequest;
 import com.nhohantu.tcbookbe.cms.dto.response.CmsCreateCategoryResponse;
 import com.nhohantu.tcbookbe.cms.dto.response.CmsListCategoryResponse;
 import com.nhohantu.tcbookbe.cms.service.CmsCategoryService;
@@ -34,5 +35,15 @@ public class CmsCategoryController {
     @GetMapping("/list")
     public ResponseEntity<ResponseDTO<List<CmsListCategoryResponse>>> findAllCategory() {
         return categoryService.findAllCategory();
+    }
+
+    @PutMapping
+    public ResponseEntity<ResponseDTO<CmsCreateCategoryResponse>> update(@RequestBody CmsUpdateCategoryRequest request) {
+        return categoryService.updateCategory(request);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseDTO<Object>> delete(@PathVariable Long id) {
+        return categoryService.deleteCategory(id);
     }
 }
