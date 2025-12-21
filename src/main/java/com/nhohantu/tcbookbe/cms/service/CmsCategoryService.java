@@ -3,6 +3,7 @@ package com.nhohantu.tcbookbe.cms.service;
 import com.nhohantu.tcbookbe.business.dto.response.GetProductListResponse;
 import com.nhohantu.tcbookbe.business.repository.IProductRepository;
 import com.nhohantu.tcbookbe.cms.dto.request.CmsCreateCategoryRequest;
+import com.nhohantu.tcbookbe.cms.dto.request.CmsUpdateCategoryRequest;
 import com.nhohantu.tcbookbe.cms.dto.response.CmsCreateCategoryResponse;
 import com.nhohantu.tcbookbe.cms.dto.response.CmsListCategoryResponse;
 import com.nhohantu.tcbookbe.cms.repository.ICmsCategoryRepository;
@@ -17,6 +18,7 @@ import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -337,5 +339,143 @@ public class CmsCategoryService {
     public boolean existsBySlugAndLevel(String slug, Integer level) {
         return categoryRepository.existsBySlugAndCategoryLevel(slug, level);
     }
+
+    @Transactional
+    public ResponseEntity<ResponseDTO<CmsCreateCategoryResponse>> updateCategory(CmsUpdateCategoryRequest request) {
+        if (request == null || request.getId() == null) {
+            return ResponseBuilder.badRequestResponse("Thiếu id danh mục", StatusCodeEnum.ERRORCODE4000);
+        }
+
+        Optional<CategoryModel> currentOpt = categoryRepository.findById(request.getId());
+        if (currentOpt.isEmpty()) {
+            return ResponseBuilder.badRequestResponse("Danh mục không tồn tại", StatusCodeEnum.ERRORCODE4000);
+        }
+        CategoryModel current = currentOpt.get();
+
+        // 1) Chuẩn hoá dữ liệu mới
+        String newName = (request.getName() != null) ? request.getName().trim() : current.getName();
+        if (newName == null || newName.isEmpty()) {
+            return ResponseBuilder.badRequestResponse("Tên danh mục không được trống", StatusCodeEnum.ERRORCODE4000);
+        }
+
+        Integer newLevel = (request.getCategoryLevel() != null) ? request.getCategoryLevel() : current.getCategoryLevel();
+        if (newLevel == null) {
+            return ResponseBuilder.badRequestResponse("Cấp độ danh mục không được trống", StatusCodeEnum.ERRORCODE4000);
+        }
+        if (newLevel < 1 || newLevel > 3) {
+            return ResponseBuilder.badRequestResponse("Cấp độ danh mục không hợp lệ", StatusCodeEnum.ERRORCODE4000);
+        }
+
+        Long newParentId = (request.getParentId() != null) ? request.getParentId() :
+                (current.getParentCategory() != null ? current.getParentCategory().getId() : null);
+
+        // 2) Validate parent theo level
+        CategoryModel newParent = null;
+
+        if (newLevel == 1) {
+            if (newParentId != null) {
+                return ResponseBuilder.badRequestResponse("Danh mục cấp 1 không được có danh mục cha", StatusCodeEnum.ERRORCODE4000);
+            }
+        } else {
+            // level 2 hoặc 3
+            if (newParentId == null) {
+                return ResponseBuilder.badRequestResponse("Danh mục cấp 2 trở lên phải có danh mục cha", StatusCodeEnum.ERRORCODE4000);
+            }
+            if (newParentId.equals(current.getId())) {
+                return ResponseBuilder.badRequestResponse("Danh mục không thể là cha của chính nó", StatusCodeEnum.ERRORCODE4000);
+            }
+
+            Optional<CategoryModel> parentOpt = categoryRepository.findById(newParentId);
+            if (parentOpt.isEmpty()) {
+                return ResponseBuilder.badRequestResponse("Danh mục cha không tồn tại", StatusCodeEnum.ERRORCODE4000);
+            }
+            newParent = parentOpt.get();
+
+            Integer parentLevel = newParent.getCategoryLevel();
+            if (parentLevel == null) {
+                return ResponseBuilder.badRequestResponse("Danh mục cha không hợp lệ", StatusCodeEnum.ERRORCODE4000);
+            }
+            if (parentLevel == 3) {
+                return ResponseBuilder.badRequestResponse("Không thể tạo danh mục con cho danh mục cấp 3", StatusCodeEnum.ERRORCODE4000);
+            }
+            if (parentLevel + 1 != newLevel) {
+                return ResponseBuilder.badRequestResponse("Cấp độ danh mục không hợp lệ so với danh mục cha", StatusCodeEnum.ERRORCODE4000);
+            }
+
+            // 3) Chặn cycle: không cho parent nằm trong cây con của current
+            if (isDescendant(current, newParentId)) {
+                return ResponseBuilder.badRequestResponse("Danh mục cha không hợp lệ (tạo vòng lặp)", StatusCodeEnum.ERRORCODE4000);
+            }
+        }
+
+        // 4) Slug + check trùng slug (exclude chính nó)
+        String newSlug = Util.generateSlug(newName);
+        if (existsBySlugAndLevelExcludeId(newSlug, newLevel, current.getId())) {
+            return ResponseBuilder.badRequestResponse("Slug danh mục đã tồn tại", StatusCodeEnum.ERRORCODE4000);
+        }
+
+        // 5) Apply update
+        current.setName(newName);
+        current.setSlug(newSlug);
+        current.setCategoryLevel(newLevel);
+        current.setParentCategory(newParent);
+
+        if (request.getImageUrl() != null) {
+            current.setImageUrl(request.getImageUrl());
+        }
+
+        CategoryModel saved = categoryRepository.save(current);
+        CmsCreateCategoryResponse response = mapper.map(saved, CmsCreateCategoryResponse.class);
+
+        return ResponseBuilder.okResponse("Cập nhật danh mục thành công", response, StatusCodeEnum.SUCCESS2000);
+    }
+
+    /**
+     * Check parentId có nằm trong cây con của current không
+     * (để tránh current -> ... -> parent trỏ ngược)
+     */
+    private boolean isDescendant(CategoryModel current, Long candidateParentId) {
+        if (candidateParentId == null) return false;
+        if (current.getChildCategories() == null) return false;
+
+        for (CategoryModel child : current.getChildCategories()) {
+            if (child.getId().equals(candidateParentId)) return true;
+            if (isDescendant(child, candidateParentId)) return true;
+        }
+        return false;
+    }
+
+    private boolean existsBySlugAndLevelExcludeId(String slug, Integer level, Long excludeId) {
+        return categoryRepository.existsBySlugAndCategoryLevelAndIdNot(slug, level, excludeId);
+    }
+
+    @Transactional
+    public ResponseEntity<ResponseDTO<Object>> deleteCategory(Long id) {
+        if (id == null) {
+            return ResponseBuilder.badRequestResponse("Thiếu id danh mục", StatusCodeEnum.ERRORCODE4000);
+        }
+
+        Optional<CategoryModel> opt = categoryRepository.findById(id);
+        if (opt.isEmpty()) {
+            return ResponseBuilder.badRequestResponse("Danh mục không tồn tại", StatusCodeEnum.ERRORCODE4000);
+        }
+        CategoryModel category = opt.get();
+
+        // 1) Không cho xoá nếu có con
+        if (category.getChildCategories() != null && !category.getChildCategories().isEmpty()) {
+            return ResponseBuilder.badRequestResponse("Không thể xoá danh mục đang có danh mục con", StatusCodeEnum.ERRORCODE4000);
+        }
+
+        // 2) Không cho xoá nếu có sản phẩm
+        long productCount = (category.getProductCategories() != null) ? category.getProductCategories().size() : 0;
+        if (productCount > 0) {
+            return ResponseBuilder.badRequestResponse("Không thể xoá danh mục đang có sản phẩm", StatusCodeEnum.ERRORCODE4000);
+        }
+
+        categoryRepository.delete(category);
+
+        return ResponseBuilder.okResponse("Xoá danh mục thành công", null, StatusCodeEnum.SUCCESS2000);
+    }
+
 }
 

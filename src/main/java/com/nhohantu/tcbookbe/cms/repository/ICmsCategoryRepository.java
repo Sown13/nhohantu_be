@@ -14,4 +14,6 @@ public interface ICmsCategoryRepository extends BaseCategoryRepository {
     Optional<CategoryModel> findBySlug(String slug);
     List<CategoryModel> findAllByCategoryLevel(Integer categoryLevel);
     boolean existsBySlugAndCategoryLevel(String slug, Integer categoryLevel);
+    boolean existsBySlugAndCategoryLevelAndIdNot(String slug, Integer categoryLevel, Long id);
+
 }
