@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -23,5 +25,12 @@ public class CmsImageUploadController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Map<String, Object> upload(@RequestPart("file") MultipartFile file) {
         return uploadImageService.upload(file);
+    }
+
+    @PostMapping(value = "/multi-upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public List<Map<String, Object>> uploadMany(@RequestPart("files") MultipartFile[] files) {
+        return Arrays.stream(files)
+                .map(uploadImageService::upload)
+                .toList();
     }
 }
