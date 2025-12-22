@@ -98,4 +98,19 @@ public class CmsProductController {
         return ResponseEntity.ok(responseDTO);
     }
 
+    @PatchMapping("/products/{id}/active")
+    public ResponseEntity<ResponseDTO<Void>> changeProductActiveStatus(
+            @PathVariable Long id,
+            @RequestParam Boolean active) {
+
+        productService.changeActiveStatus(id, active);
+
+        return ResponseEntity.ok(
+                ResponseDTO.<Void>builder()
+                        .success(true)
+                        .message(active ? "Product activated successfully"
+                                : "Product deactivated successfully")
+                        .build()
+        );
+    }
 }

@@ -259,4 +259,16 @@ public class CmsProductService {
 
         return response;
     }
+
+    @Transactional
+    public void changeActiveStatus(Long productId, Boolean active) {
+
+        ProductModel product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        product.setActive(active);
+
+        productRepository.save(product);
+    }
+
 }
