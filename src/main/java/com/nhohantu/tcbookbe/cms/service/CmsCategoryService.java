@@ -3,22 +3,25 @@ package com.nhohantu.tcbookbe.cms.service;
 import com.nhohantu.tcbookbe.business.dto.response.GetProductListResponse;
 import com.nhohantu.tcbookbe.business.repository.IProductRepository;
 import com.nhohantu.tcbookbe.cms.dto.request.CmsCreateCategoryRequest;
+import com.nhohantu.tcbookbe.cms.dto.request.CmsUpdateCategoryRequest;
 import com.nhohantu.tcbookbe.cms.dto.response.CmsCreateCategoryResponse;
 import com.nhohantu.tcbookbe.cms.dto.response.CmsListCategoryResponse;
 import com.nhohantu.tcbookbe.cms.repository.ICmsCategoryRepository;
-import com.nhohantu.tcbookbe.cms.repository.ICmsProductRepository;
 import com.nhohantu.tcbookbe.common.model.builder.ResponseBuilder;
 import com.nhohantu.tcbookbe.common.model.builder.ResponseDTO;
 import com.nhohantu.tcbookbe.common.model.entity.CategoryModel;
 import com.nhohantu.tcbookbe.common.model.entity.ProductModel;
 import com.nhohantu.tcbookbe.common.model.enums.StatusCodeEnum;
+import com.nhohantu.tcbookbe.common.utils.Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,7 +29,7 @@ import java.util.stream.Collectors;
 @Log4j2
 @RequiredArgsConstructor
 public class CmsCategoryService {
-    private final ICmsCategoryRepository categoryService;
+    private final ICmsCategoryRepository categoryRepository;
     private final ModelMapper mapper;
     private final IProductRepository productRepository;
 
@@ -56,7 +59,7 @@ public class CmsCategoryService {
             Integer categoryLevel = request.getCategoryLevel();
 
             if (request.getParentId() != null) {
-                Optional<CategoryModel> parentOptional = categoryService.findById(request.getParentId());
+                Optional<CategoryModel> parentOptional = categoryRepository.findById(request.getParentId());
                 if (parentOptional.isEmpty()) {
                     return ResponseBuilder.badRequestResponse("Danh mục cha không tồn tại", StatusCodeEnum.ERRORCODE4000);
                 }
@@ -70,9 +73,22 @@ public class CmsCategoryService {
                 }
             }
 
-            CategoryModel category = CategoryModel.builder().name(request.getName()).parentCategory(parentCategory).categoryLevel(categoryLevel).build();
+            String slug = Util.generateSlug(request.getName());
 
-            CategoryModel result = categoryService.save(category);
+            //check trùng slug
+            if (existsBySlugAndLevel(slug, categoryLevel)) {
+                return ResponseBuilder.badRequestResponse(
+                        "Slug danh mục đã tồn tại",
+                        StatusCodeEnum.ERRORCODE4000
+                );
+            }
+            CategoryModel category = CategoryModel.builder()
+                    .name(request.getName())
+                    .parentCategory(parentCategory)
+                    .slug(slug)
+                    .categoryLevel(categoryLevel).build();
+
+            CategoryModel result = categoryRepository.save(category);
             CmsCreateCategoryResponse response = mapper.map(result, CmsCreateCategoryResponse.class);
 
             return ResponseBuilder.okResponse("Tạo danh mục thành công", response, StatusCodeEnum.SUCCESS2000);
@@ -87,7 +103,7 @@ public class CmsCategoryService {
 
     public ResponseEntity<ResponseDTO<List<CmsCreateCategoryResponse>>> findAllCategoryLevel3() {
         try {
-            List<CategoryModel> categories = categoryService.findByCategoryLevel(3);
+            List<CategoryModel> categories = categoryRepository.findByCategoryLevel(3);
 
             List<CmsCreateCategoryResponse> responseList = categories.stream().map(category -> mapper.map(category, CmsCreateCategoryResponse.class)).collect(Collectors.toList());
 
@@ -101,7 +117,7 @@ public class CmsCategoryService {
 
     public ResponseEntity<ResponseDTO<List<CmsListCategoryResponse>>> findAllCategory() {
         try {
-            List<CategoryModel> allCategories = categoryService.findAll();
+            List<CategoryModel> allCategories = categoryRepository.findAll();
 
             Map<Long, CmsListCategoryResponse> categoryMap = allCategories.stream()
                     .map(category -> {
@@ -147,7 +163,7 @@ public class CmsCategoryService {
     public ResponseEntity<ResponseDTO<List<CmsListCategoryResponse>>> findCategoryProducts() {
         try {
             List<CategoryModel> allCategories = new ArrayList<>(
-                    categoryService.findAll().stream()
+                    categoryRepository.findAll().stream()
                             .filter(c -> c.getCategoryLevel() != null)
                             .toList()
             );
@@ -209,6 +225,7 @@ public class CmsCategoryService {
                 .slug(product.getSlug())
                 .description(product.getDescription())
                 .price(product.getPrice())
+                .mainImageUrl(product.getMainImageUrl())
                 .salePrice(product.getSalePrice())
                 .brand(product.getBrand())
                 .rating(product.getRating())
@@ -240,7 +257,7 @@ public class CmsCategoryService {
             Boolean onSale
     ) {
         // 1. Find category by slug
-        Optional<CategoryModel> categoryOpt = categoryService.findBySlug(slug);
+        Optional<CategoryModel> categoryOpt = categoryRepository.findBySlug(slug);
         if (categoryOpt.isEmpty()) {
             return ResponseBuilder.badRequestResponse("Category not found", StatusCodeEnum.EXCEPTION0404);
         }
@@ -251,7 +268,6 @@ public class CmsCategoryService {
 
         // 3. Fetch products
         List<ProductModel> products = productRepository.findProductsByCategoryIds(categoryIds);
-
         if (products == null) products = new ArrayList<>();
 
         // 4. Set default filter values
@@ -263,35 +279,43 @@ public class CmsCategoryService {
         // 5. Filter products
         List<ProductModel> filteredProducts = products.stream()
                 .filter(p -> {
-                    BigDecimal effectivePrice = (p.getSalePrice() != null && p.getSalePrice().compareTo(BigDecimal.ZERO) > 0)
-                            ? p.getSalePrice()
-                            : p.getPrice();
+                    BigDecimal effectivePrice = getEffectivePrice(p);
                     return effectivePrice.compareTo(BigDecimal.valueOf(minPrice)) >= 0 &&
                             effectivePrice.compareTo(BigDecimal.valueOf(maxPrice)) <= 0;
                 })
                 .filter(p -> !filterOnSale || (p.getSalePrice() != null && p.getSalePrice().compareTo(p.getPrice()) < 0))
                 .toList();
 
-        // 6. Sort products
+        // 6. Sort products (null-safe)
         List<ProductModel> sortedProducts = switch (sortOption) {
             case "lowest" -> filteredProducts.stream()
-                    .sorted(Comparator.comparing(p -> (p.getSalePrice() != null && p.getSalePrice().compareTo(BigDecimal.ZERO) > 0)
-                            ? p.getSalePrice()
-                            : p.getPrice()))
+                    .sorted(Comparator.comparing(
+                            IProductRepository::getEffectivePrice,
+                            Comparator.nullsLast(Comparator.naturalOrder())
+                    ))
                     .toList();
+
             case "highest" -> filteredProducts.stream()
-                    .sorted(Comparator.comparing((ProductModel p) ->
-                            (p.getSalePrice() != null && p.getSalePrice().compareTo(BigDecimal.ZERO) > 0)
-                                    ? p.getSalePrice()
-                                    : p.getPrice()
+                    .sorted(Comparator.comparing(
+                            IProductRepository::getEffectivePrice,
+                            Comparator.nullsLast(Comparator.naturalOrder())
                     ).reversed())
                     .toList();
+
             case "best-selling" -> filteredProducts.stream()
-                    .sorted(Comparator.comparing(ProductModel::getSold).reversed())
+                    .sorted(Comparator.comparing(
+                            p -> p.getSold() != null ? p.getSold() : 0,
+                            Comparator.reverseOrder()
+                    ))
                     .toList();
+
             case "new-arrival" -> filteredProducts.stream()
-                    .sorted(Comparator.comparing(ProductModel::getCreatedAt).reversed())
+                    .sorted(Comparator.comparing(
+                            p -> p.getCreatedAt() != null ? p.getCreatedAt() : LocalDateTime.of(1970, 1, 1, 0, 0),
+                            Comparator.reverseOrder()
+                    ))
                     .toList();
+
             default -> filteredProducts;
         };
 
@@ -301,6 +325,156 @@ public class CmsCategoryService {
                 .toList();
 
         return ResponseBuilder.okResponse("SUCCESS", response, StatusCodeEnum.SUCCESS2000);
+    }
+
+    // --- Helper method ---
+    private static BigDecimal getEffectivePrice(ProductModel product) {
+        if (product == null) return BigDecimal.ZERO;
+        if (product.getSalePrice() != null && product.getSalePrice().compareTo(BigDecimal.ZERO) > 0) {
+            return product.getSalePrice();
+        }
+        return product.getPrice() != null ? product.getPrice() : BigDecimal.ZERO;
+    }
+
+    public boolean existsBySlugAndLevel(String slug, Integer level) {
+        return categoryRepository.existsBySlugAndCategoryLevel(slug, level);
+    }
+
+    @Transactional
+    public ResponseEntity<ResponseDTO<CmsCreateCategoryResponse>> updateCategory(CmsUpdateCategoryRequest request) {
+        if (request == null || request.getId() == null) {
+            return ResponseBuilder.badRequestResponse("Thiếu id danh mục", StatusCodeEnum.ERRORCODE4000);
+        }
+
+        Optional<CategoryModel> currentOpt = categoryRepository.findById(request.getId());
+        if (currentOpt.isEmpty()) {
+            return ResponseBuilder.badRequestResponse("Danh mục không tồn tại", StatusCodeEnum.ERRORCODE4000);
+        }
+        CategoryModel current = currentOpt.get();
+
+        // 1) Chuẩn hoá dữ liệu mới
+        String newName = (request.getName() != null) ? request.getName().trim() : current.getName();
+        if (newName == null || newName.isEmpty()) {
+            return ResponseBuilder.badRequestResponse("Tên danh mục không được trống", StatusCodeEnum.ERRORCODE4000);
+        }
+
+        Integer newLevel = (request.getCategoryLevel() != null) ? request.getCategoryLevel() : current.getCategoryLevel();
+        if (newLevel == null) {
+            return ResponseBuilder.badRequestResponse("Cấp độ danh mục không được trống", StatusCodeEnum.ERRORCODE4000);
+        }
+        if (newLevel < 1 || newLevel > 3) {
+            return ResponseBuilder.badRequestResponse("Cấp độ danh mục không hợp lệ", StatusCodeEnum.ERRORCODE4000);
+        }
+
+        Long newParentId = (request.getParentId() != null) ? request.getParentId() :
+                (current.getParentCategory() != null ? current.getParentCategory().getId() : null);
+
+        // 2) Validate parent theo level
+        CategoryModel newParent = null;
+
+        if (newLevel == 1) {
+            if (newParentId != null) {
+                return ResponseBuilder.badRequestResponse("Danh mục cấp 1 không được có danh mục cha", StatusCodeEnum.ERRORCODE4000);
+            }
+        } else {
+            // level 2 hoặc 3
+            if (newParentId == null) {
+                return ResponseBuilder.badRequestResponse("Danh mục cấp 2 trở lên phải có danh mục cha", StatusCodeEnum.ERRORCODE4000);
+            }
+            if (newParentId.equals(current.getId())) {
+                return ResponseBuilder.badRequestResponse("Danh mục không thể là cha của chính nó", StatusCodeEnum.ERRORCODE4000);
+            }
+
+            Optional<CategoryModel> parentOpt = categoryRepository.findById(newParentId);
+            if (parentOpt.isEmpty()) {
+                return ResponseBuilder.badRequestResponse("Danh mục cha không tồn tại", StatusCodeEnum.ERRORCODE4000);
+            }
+            newParent = parentOpt.get();
+
+            Integer parentLevel = newParent.getCategoryLevel();
+            if (parentLevel == null) {
+                return ResponseBuilder.badRequestResponse("Danh mục cha không hợp lệ", StatusCodeEnum.ERRORCODE4000);
+            }
+            if (parentLevel == 3) {
+                return ResponseBuilder.badRequestResponse("Không thể tạo danh mục con cho danh mục cấp 3", StatusCodeEnum.ERRORCODE4000);
+            }
+            if (parentLevel + 1 != newLevel) {
+                return ResponseBuilder.badRequestResponse("Cấp độ danh mục không hợp lệ so với danh mục cha", StatusCodeEnum.ERRORCODE4000);
+            }
+
+            // 3) Chặn cycle: không cho parent nằm trong cây con của current
+            if (isDescendant(current, newParentId)) {
+                return ResponseBuilder.badRequestResponse("Danh mục cha không hợp lệ (tạo vòng lặp)", StatusCodeEnum.ERRORCODE4000);
+            }
+        }
+
+        // 4) Slug + check trùng slug (exclude chính nó)
+        String newSlug = Util.generateSlug(newName);
+        if (existsBySlugAndLevelExcludeId(newSlug, newLevel, current.getId())) {
+            return ResponseBuilder.badRequestResponse("Slug danh mục đã tồn tại", StatusCodeEnum.ERRORCODE4000);
+        }
+
+        // 5) Apply update
+        current.setName(newName);
+        current.setSlug(newSlug);
+        current.setCategoryLevel(newLevel);
+        current.setParentCategory(newParent);
+
+        if (request.getImageUrl() != null) {
+            current.setImageUrl(request.getImageUrl());
+        }
+
+        CategoryModel saved = categoryRepository.save(current);
+        CmsCreateCategoryResponse response = mapper.map(saved, CmsCreateCategoryResponse.class);
+
+        return ResponseBuilder.okResponse("Cập nhật danh mục thành công", response, StatusCodeEnum.SUCCESS2000);
+    }
+
+    /**
+     * Check parentId có nằm trong cây con của current không
+     * (để tránh current -> ... -> parent trỏ ngược)
+     */
+    private boolean isDescendant(CategoryModel current, Long candidateParentId) {
+        if (candidateParentId == null) return false;
+        if (current.getChildCategories() == null) return false;
+
+        for (CategoryModel child : current.getChildCategories()) {
+            if (child.getId().equals(candidateParentId)) return true;
+            if (isDescendant(child, candidateParentId)) return true;
+        }
+        return false;
+    }
+
+    private boolean existsBySlugAndLevelExcludeId(String slug, Integer level, Long excludeId) {
+        return categoryRepository.existsBySlugAndCategoryLevelAndIdNot(slug, level, excludeId);
+    }
+
+    @Transactional
+    public ResponseEntity<ResponseDTO<Object>> deleteCategory(Long id) {
+        if (id == null) {
+            return ResponseBuilder.badRequestResponse("Thiếu id danh mục", StatusCodeEnum.ERRORCODE4000);
+        }
+
+        Optional<CategoryModel> opt = categoryRepository.findById(id);
+        if (opt.isEmpty()) {
+            return ResponseBuilder.badRequestResponse("Danh mục không tồn tại", StatusCodeEnum.ERRORCODE4000);
+        }
+        CategoryModel category = opt.get();
+
+        // 1) Không cho xoá nếu có con
+        if (category.getChildCategories() != null && !category.getChildCategories().isEmpty()) {
+            return ResponseBuilder.badRequestResponse("Không thể xoá danh mục đang có danh mục con", StatusCodeEnum.ERRORCODE4000);
+        }
+
+        // 2) Không cho xoá nếu có sản phẩm
+        long productCount = (category.getProductCategories() != null) ? category.getProductCategories().size() : 0;
+        if (productCount > 0) {
+            return ResponseBuilder.badRequestResponse("Không thể xoá danh mục đang có sản phẩm", StatusCodeEnum.ERRORCODE4000);
+        }
+
+        categoryRepository.delete(category);
+
+        return ResponseBuilder.okResponse("Xoá danh mục thành công", null, StatusCodeEnum.SUCCESS2000);
     }
 
 }

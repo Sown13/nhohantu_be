@@ -23,6 +23,7 @@ public class ProductDetailResponse {
     private BigDecimal salePrice;
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
+    private String mainImageUrl;
     private AttachmentResponse image; // ảnh chính
     private List<AttachmentResponse> gallery;
     private CategoryResponse category;
