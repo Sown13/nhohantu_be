@@ -37,4 +37,5 @@ public class GetProductListResponse {
     private Float rating;
     private Float discountPercentage;
     private Float weight;
+    private Boolean active;
 }

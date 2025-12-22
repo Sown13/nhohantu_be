@@ -9,7 +9,6 @@ import com.nhohantu.tcbookbe.common.model.builder.ResponseBuilder;
 import com.nhohantu.tcbookbe.common.model.builder.ResponseDTO;
 import com.nhohantu.tcbookbe.common.model.entity.CategoryModel;
 import com.nhohantu.tcbookbe.common.model.entity.ProductCategoryModel;
-import com.nhohantu.tcbookbe.common.model.entity.ProductImageModel;
 import com.nhohantu.tcbookbe.common.model.entity.ProductModel;
 import com.nhohantu.tcbookbe.common.model.enums.StatusCodeEnum;
 import com.nhohantu.tcbookbe.common.utils.PagingValidationUtil;
@@ -176,6 +175,7 @@ public class ProductService {
         response.setRating(product.getRating());
         response.setDiscountPercentage(product.getDiscountPercentage());
         response.setWeight(product.getWeight());
+        response.setActive(product.getActive());
 
         return ResponseBuilder.okResponse("Success", response, StatusCodeEnum.SUCCESS2000);
     }
@@ -222,6 +222,7 @@ public class ProductService {
                 .rating(0f) // placeholder
                 .discountPercentage(0f) // placeholder
                 .weight(0f) // placeholder
+                .active(product.getActive())
                 .build();
     }
 
