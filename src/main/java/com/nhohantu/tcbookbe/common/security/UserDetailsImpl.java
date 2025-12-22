@@ -1,7 +1,9 @@
 package com.nhohantu.tcbookbe.common.security;
 
-import com.nhohantu.tcbookbe.common.model.system.*;
-import lombok.AllArgsConstructor;
+import com.nhohantu.tcbookbe.common.model.system.RolePermissionModel;
+import com.nhohantu.tcbookbe.common.model.system.SysPermissionModel;
+import com.nhohantu.tcbookbe.common.model.system.SysRoleModel;
+import com.nhohantu.tcbookbe.common.model.system.UserBasicInfoModel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,13 +15,30 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class UserDetailsImpl implements UserDetails {
     private UserBasicInfoModel user;
+    private Collection<? extends GrantedAuthority> authorities;
+
+    public UserDetailsImpl(UserBasicInfoModel user) {
+        this.user = user;
+        this.authorities = null;
+    }
+
+    public UserDetailsImpl(
+            UserBasicInfoModel user,
+            Collection<? extends GrantedAuthority> authorities
+    ) {
+        this.user = user;
+        this.authorities = authorities;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        // nếu đã truyền sẵn authorities thì dùng luôn
+        if (authorities != null) return authorities;
+
+        //ko có thì tìm
         String ROLE_PREFIX = "ROLE_";
         String PERM_PREFIX = "PERM_";
         return user.getUserRoles().stream()

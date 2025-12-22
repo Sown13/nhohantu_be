@@ -56,6 +56,7 @@ public class RootUserInitializer implements CommandLineRunner {
             rootUser.setLastName("Administrator");
             rootUser.setEmail(rootEmail);
             rootUser.setPrimaryPhone("0000000000");
+            rootUser.setLocked(false);
             rootUser = userRepo.save(rootUser);
 
             // gán role ROOT cho user
