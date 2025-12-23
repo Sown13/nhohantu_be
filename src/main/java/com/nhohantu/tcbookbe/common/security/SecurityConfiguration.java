@@ -26,7 +26,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    private final String[] PUBLIC_ENDPOINT = {"swagger-ui/**", "/v3/api-docs/**", "/login", "/check-authority"};
+    private final String[] PUBLIC_ENDPOINT = {"swagger-ui/**", "/v3/api-docs/**", "/login", "/check-authority","/user-info/**",};
 
     private final String[] PERMIT_FOR_DEVELOPING = {"swagger-ui/**", "/v3/api-docs/**", "/login", "/check-authority", "/user-info/create-user", "/user-info/**"};
 
@@ -61,7 +61,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/cms/**").hasAnyRole("ADMIN", "ROOT")
 
                         // còn lại: yêu cầu đăng nhập
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

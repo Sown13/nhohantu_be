@@ -5,13 +5,13 @@ import com.nhohantu.tcbookbe.common.model.builder.ResponseDTO;
 import com.nhohantu.tcbookbe.common.model.dto.request.LoginRequest;
 import com.nhohantu.tcbookbe.common.model.dto.request.RegisterRequest;
 import com.nhohantu.tcbookbe.common.model.dto.response.LoginResponse;
-import com.nhohantu.tcbookbe.common.model.system.UserBasicInfoModel;
 import com.nhohantu.tcbookbe.common.model.enums.StatusCodeEnum;
+import com.nhohantu.tcbookbe.common.model.system.UserBasicInfoModel;
 import com.nhohantu.tcbookbe.common.repository.BaseUserInfoRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -59,8 +59,18 @@ public class AuthenticationService {
         UserDetailsImpl authenticatedUser;
         try {
             authenticatedUser = authenticate(request);
-        } catch (Exception e) {
-            return ResponseBuilder.badRequestResponse("Login Failed", StatusCodeEnum.ERRORCODE4000);
+        } catch (LockedException e) {
+            return ResponseBuilder.badRequestResponse("Tài khoản đã bị khóa, vui lòng liên hệ quản trị viên", StatusCodeEnum.ERRORCODE_LOCKED);
+        } catch (DisabledException e) {
+            return ResponseBuilder.badRequestResponse("Tài khoản chưa kích hoạt", StatusCodeEnum.ERRORCODE_DISABLED);
+        } catch (AccountExpiredException e) {
+            return ResponseBuilder.badRequestResponse("Tài khoản đã hết hạn", StatusCodeEnum.ERRORCODE_ACCOUNT_EXPIRED);
+        } catch (CredentialsExpiredException e) {
+            return ResponseBuilder.badRequestResponse("Mật khẩu đã hết hạn", StatusCodeEnum.ERRORCODE_CREDENTIALS_EXPIRED);
+        } catch (BadCredentialsException e) {
+            return ResponseBuilder.badRequestResponse("Sai username hoặc password", StatusCodeEnum.ERRORCODE_BAD_CREDENTIALS);
+        } catch (UsernameNotFoundException e) {
+            return ResponseBuilder.badRequestResponse("Không tìm thấy tài khoản", StatusCodeEnum.ERRORCODE_USER_NOT_FOUND);
         }
 
         String jwtToken = jwtService.generateToken(authenticatedUser);
