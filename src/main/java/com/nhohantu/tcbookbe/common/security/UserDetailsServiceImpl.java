@@ -23,15 +23,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private final BaseUserInfoRepo userInfoRepository;
     private final BaseUserSysRoleRepository sysRoleRepository;
 
-//    @Override
-//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-//        Optional<UserBasicInfoModel> userInfo = userInfoRepository.findByUsername(username);
-//        if (userInfo.isPresent()) {
-//            return new UserDetailsImpl(userInfo.get());
-//        }
-//
-//        return null;
-//    }
+    public UserDetails loadUserByUsernameForCheckingExist(String username) throws UsernameNotFoundException {
+        Optional<UserBasicInfoModel> userInfo = userInfoRepository.findByUsername(username);
+        if (userInfo.isPresent()) {
+            return new UserDetailsImpl(userInfo.get());
+        }
+
+        return null;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

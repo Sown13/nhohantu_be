@@ -42,7 +42,7 @@ public class UserBasicInfoService {
     public ResponseEntity<ResponseDTO<RegisterResponse>> register(@RequestBody @Valid RegisterRequest request) {
         UserDetailsImpl registeredUser;
         try {
-            UserDetails usernameExist = userDetailsService.loadUserByUsername(request.getUsername());
+            UserDetails usernameExist = userDetailsService.loadUserByUsernameForCheckingExist(request.getUsername());
             if (usernameExist != null) {
                 return ResponseBuilder.badRequestResponse("Create new user failed, please use other username",
                         StatusCodeEnum.ERRORCODE4000);

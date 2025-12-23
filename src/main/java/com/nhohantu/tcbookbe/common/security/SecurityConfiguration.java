@@ -23,7 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    private final String[] PUBLIC_ENDPOINT = {"swagger-ui/**", "/v3/api-docs/**", "/login", "/check-authority"};
+    private final String[] PUBLIC_ENDPOINT = {"swagger-ui/**", "/v3/api-docs/**", "/login", "/check-authority","/user-info/**",};
 
     private final String[] PERMIT_FOR_DEVELOPING = {"swagger-ui/**", "/v3/api-docs/**", "/login", "/check-authority", "/user-info/create-user", "/user-info/**"};
 
