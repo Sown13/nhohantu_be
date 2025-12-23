@@ -477,4 +477,36 @@ public class CmsCategoryService {
         return ResponseBuilder.okResponse("Xoá danh mục thành công", null, StatusCodeEnum.SUCCESS2000);
     }
 
+    @Transactional
+    public ResponseEntity<ResponseDTO<String>> migrateSlugForAllCategories() {
+        try {
+            List<CategoryModel> categories = categoryRepository.findAll();
+            int updatedCount = 0;
+
+            for (CategoryModel category : categories) {
+                if (category.getSlug() == null || category.getSlug().isEmpty()) {
+                    String newSlug = Util.generateSlug(category.getName());
+                    
+                    // Nếu slug bị trùng, thêm suffix id
+                    if (existsBySlugAndLevelExcludeId(newSlug, category.getCategoryLevel(), category.getId())) {
+                        newSlug = newSlug + "-" + category.getId();
+                    }
+                    
+                    category.setSlug(newSlug);
+                    categoryRepository.save(category);
+                    updatedCount++;
+                }
+            }
+
+            return ResponseBuilder.okResponse(
+                    "Đã cập nhật slug cho " + updatedCount + " danh mục",
+                    "Updated: " + updatedCount,
+                    StatusCodeEnum.SUCCESS2000
+            );
+        } catch (Exception e) {
+            log.error("Error migrating slugs: {}", e.getMessage(), e);
+            return ResponseBuilder.badRequestResponse("Lỗi khi migrate slug: " + e.getMessage(), StatusCodeEnum.ERRORCODE4000);
+        }
+    }
+
 }
