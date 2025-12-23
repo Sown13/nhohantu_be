@@ -60,7 +60,7 @@ public class AuthenticationService {
         try {
             authenticatedUser = authenticate(request);
         } catch (LockedException e) {
-            return ResponseBuilder.badRequestResponse("Tài khoản đã bị khóa", StatusCodeEnum.ERRORCODE_LOCKED);
+            return ResponseBuilder.badRequestResponse("Tài khoản đã bị khóa, vui lòng liên hệ quản trị viên", StatusCodeEnum.ERRORCODE_LOCKED);
         } catch (DisabledException e) {
             return ResponseBuilder.badRequestResponse("Tài khoản chưa kích hoạt", StatusCodeEnum.ERRORCODE_DISABLED);
         } catch (AccountExpiredException e) {
