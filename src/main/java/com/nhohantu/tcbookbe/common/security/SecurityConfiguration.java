@@ -58,7 +58,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/cms/**").hasAnyRole("ADMIN", "ROOT")
 
                         // còn lại: yêu cầu đăng nhập
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
