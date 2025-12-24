@@ -30,7 +30,7 @@ public class RootUserInitializer implements CommandLineRunner {
     @Value("${app.root.email:root@system.local}") // có default nếu không khai báo
     private String rootEmail;
 
-    @Override
+    @Override   
     public void run(String... args) {
         // nếu chưa có user root thì mới tạo
         if (userRepo.findByUsername(rootUsername).isEmpty()) {
