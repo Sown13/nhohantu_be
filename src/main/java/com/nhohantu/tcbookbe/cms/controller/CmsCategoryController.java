@@ -46,4 +46,9 @@ public class CmsCategoryController {
     public ResponseEntity<ResponseDTO<Object>> delete(@PathVariable Long id) {
         return categoryService.deleteCategory(id);
     }
+
+    @PostMapping("/migrate-slug")
+    public ResponseEntity<ResponseDTO<String>> migrateSlug() {
+        return categoryService.migrateSlugForAllCategories();
+    }
 }

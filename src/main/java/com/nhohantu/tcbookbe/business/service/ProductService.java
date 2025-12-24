@@ -202,7 +202,7 @@ public class ProductService {
         return GetProductListResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
-                .slug(generateSlug(product.getName()))
+                .slug(product.getSlug())
                 .price(product.getPrice())
                 .quantity(product.getQuantity())
                 .sold(0) // placeholder

@@ -67,7 +67,14 @@ public class Util {
 
     public static String generateSlug(String input) {
         if (input == null) return null;
-        return input
+        
+        // Normalize tiếng Việt - bỏ dấu
+        String normalized = java.text.Normalizer.normalize(input, java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                .replace("đ", "d")
+                .replace("Đ", "D");
+        
+        return normalized
                 .toLowerCase(Locale.ROOT)
                 .trim()
                 .replaceAll("[^a-z0-9]+", "-")
