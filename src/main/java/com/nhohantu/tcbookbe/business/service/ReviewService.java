@@ -1,6 +1,7 @@
 package com.nhohantu.tcbookbe.business.service;
 
 import com.nhohantu.tcbookbe.business.dto.request.ReviewRequest;
+import com.nhohantu.tcbookbe.business.dto.response.CanReviewResponse;
 import com.nhohantu.tcbookbe.business.dto.response.ReviewResponse;
 import com.nhohantu.tcbookbe.business.repository.IOrderRepository;
 import com.nhohantu.tcbookbe.business.repository.IProductRepository;
@@ -27,6 +28,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,6 +43,89 @@ public class ReviewService {
     private final IOrderRepository orderRepository;
     private final UserBasicInfoService userBasicInfoService;
     private final ModelMapper modelMapper;
+
+    //Kiểm tra user có thể review sản phẩm này không
+    public ResponseEntity<ResponseDTO<CanReviewResponse>> canReview(Long productId) {
+        try {
+            // 1. Kiểm tra sản phẩm có tồn tại không
+            if (!productRepository.existsById(productId)) {
+                return ResponseBuilder.badRequestResponse(
+                        "Không tìm thấy sản phẩm với ID: " + productId,
+                        StatusCodeEnum.EXCEPTION0404);
+            }
+
+            // 2. Kiểm tra user đang đăng nhập
+            UserBasicInfoModel currentUser = userBasicInfoService.getUserInfoFromContext();
+            if (currentUser == null) {
+                CanReviewResponse response = CanReviewResponse.builder()
+                        .canReview(false)
+                        .reason("Vui lòng đăng nhập để đánh giá sản phẩm")
+                        .reviewableOrders(new ArrayList<>())
+                        .build();
+                return ResponseBuilder.okResponse("Kiểm tra quyền đánh giá", response, StatusCodeEnum.SUCCESS2000);
+            }
+
+            // 3. Lấy danh sách đơn hàng DELIVERED của user có chứa sản phẩm này
+            List<OrderModel> userOrders = orderRepository.findByUserId(currentUser.getId());
+
+            List<CanReviewResponse.ReviewableOrderModel> reviewableOrders = userOrders.stream()
+                    .filter(order -> order.getStatus() == OrderStatus.DELIVERED)
+                    .filter(order -> order.getOrderDetails().stream()
+                            .anyMatch(detail -> detail.getProduct().getId().equals(productId)))
+                    .filter(order -> !reviewRepository.existsByOrderIdAndProductId(order.getId(), productId))
+                    .map(order -> CanReviewResponse.ReviewableOrderModel.builder()
+                            .orderId(order.getId())
+                            .orderDate(order.getCreatedAt() != null 
+                                    ? order.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                                    : "")
+                            .build())
+                    .collect(Collectors.toList());
+
+            if (reviewableOrders.isEmpty()) {
+                // Kiểm tra lý do không thể review
+                boolean hasOrderWithProduct = userOrders.stream()
+                        .anyMatch(order -> order.getOrderDetails().stream()
+                                .anyMatch(detail -> detail.getProduct().getId().equals(productId)));
+
+                String reason;
+                if (!hasOrderWithProduct) {
+                    reason = "Bạn cần mua sản phẩm này để có thể đánh giá";
+                } else {
+                    boolean hasDeliveredOrder = userOrders.stream()
+                            .filter(order -> order.getOrderDetails().stream()
+                                    .anyMatch(detail -> detail.getProduct().getId().equals(productId)))
+                            .anyMatch(order -> order.getStatus() == OrderStatus.DELIVERED);
+
+                    if (!hasDeliveredOrder) {
+                        reason = "Đơn hàng cần được giao thành công để có thể đánh giá";
+                    } else {
+                        reason = "Bạn đã đánh giá sản phẩm này rồi";
+                    }
+                }
+
+                CanReviewResponse response = CanReviewResponse.builder()
+                        .canReview(false)
+                        .reason(reason)
+                        .reviewableOrders(new ArrayList<>())
+                        .build();
+                return ResponseBuilder.okResponse("Kiểm tra quyền đánh giá", response, StatusCodeEnum.SUCCESS2000);
+            }
+
+            CanReviewResponse response = CanReviewResponse.builder()
+                    .canReview(true)
+                    .reason("Bạn có thể đánh giá sản phẩm này")
+                    .reviewableOrders(reviewableOrders)
+                    .build();
+
+            return ResponseBuilder.okResponse("Kiểm tra quyền đánh giá", response, StatusCodeEnum.SUCCESS2000);
+
+        } catch (Exception e) {
+            log.error("Error checking can review for product: {}", productId, e);
+            return ResponseBuilder.badRequestResponse(
+                    "Có lỗi xảy ra khi kiểm tra quyền đánh giá",
+                    StatusCodeEnum.ERRORCODE4000);
+        }
+    }
 
     //Tạo review mới cho sản phẩm
     @Transactional

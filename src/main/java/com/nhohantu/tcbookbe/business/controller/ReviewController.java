@@ -1,6 +1,7 @@
 package com.nhohantu.tcbookbe.business.controller;
 
 import com.nhohantu.tcbookbe.business.dto.request.ReviewRequest;
+import com.nhohantu.tcbookbe.business.dto.response.CanReviewResponse;
 import com.nhohantu.tcbookbe.business.dto.response.ReviewResponse;
 import com.nhohantu.tcbookbe.business.service.ReviewService;
 import com.nhohantu.tcbookbe.common.model.builder.ResponseDTO;
@@ -19,6 +20,15 @@ import java.util.List;
 public class ReviewController {
 
     private final ReviewService reviewService;
+
+    /**
+     * API kiểm tra user có thể review sản phẩm này không
+     * GET /reviews/can-review?productId=1
+     */
+    @GetMapping("/can-review")
+    public ResponseEntity<ResponseDTO<CanReviewResponse>> canReview(@RequestParam Long productId) {
+        return reviewService.canReview(productId);
+    }
 
     /**
      * API tạo đánh giá mới cho sản phẩm
