@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 public class ReviewResponse {
     private Long id;
+    private Long orderId;
     private Long productId;
     private String productName;
     private String authorName;

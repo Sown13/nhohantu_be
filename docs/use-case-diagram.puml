@@ -1,0 +1,99 @@
+@startuml TC Book - Use Case Diagram
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+
+' === ACTORS ===
+actor "Khách vãng lai" as Guest
+actor "Khách hàng" as User
+actor "Quản trị viên" as Admin
+
+' === Kế thừa Actor ===
+User -|> Guest
+Admin -|> User
+
+' === SYSTEM BOUNDARY ===
+rectangle "TC Book System" {
+    
+    ' --- Authentication ---
+    package "Xác thực" {
+        usecase "Đăng nhập" as UC_Login
+        usecase "Đăng ký" as UC_Register
+    }
+    
+    ' --- Product ---
+    package "Sản phẩm" {
+        usecase "Xem danh sách sản phẩm" as UC_ViewProducts
+        usecase "Xem chi tiết sản phẩm" as UC_ViewProductDetail
+        usecase "Tìm kiếm sản phẩm" as UC_SearchProduct
+        usecase "Xem sản phẩm bán chạy" as UC_BestSeller
+        usecase "Xem sản phẩm liên quan" as UC_RelatedProducts
+    }
+    
+    ' --- Category ---
+    package "Danh mục" {
+        usecase "Xem danh mục" as UC_ViewCategory
+        usecase "Xem sản phẩm theo danh mục" as UC_ProductByCategory
+    }
+    
+    ' --- Cart & Order ---
+    package "Giỏ hàng & Đơn hàng" {
+        usecase "Thêm vào giỏ hàng" as UC_AddToCart
+        usecase "Tạo đơn hàng" as UC_CreateOrder
+        usecase "Xem đơn hàng của tôi" as UC_ViewMyOrders
+        usecase "Thanh toán" as UC_Payment
+    }
+    
+    ' --- Review ---
+    package "Đánh giá" {
+        usecase "Xem đánh giá sản phẩm" as UC_ViewReviews
+        usecase "Tạo đánh giá" as UC_CreateReview
+    }
+    
+    ' --- CMS ---
+    package "Quản trị (CMS)" {
+        usecase "Quản lý sản phẩm" as UC_ManageProducts
+        usecase "Quản lý danh mục" as UC_ManageCategories
+        usecase "Quản lý đơn hàng" as UC_ManageOrders
+        usecase "Quản lý người dùng" as UC_ManageUsers
+        usecase "Quản lý Tag" as UC_ManageTags
+        usecase "Upload ảnh" as UC_UploadImage
+    }
+}
+
+' === RELATIONSHIPS ===
+
+' Guest
+Guest --> UC_ViewProducts
+Guest --> UC_ViewProductDetail
+Guest --> UC_SearchProduct
+Guest --> UC_BestSeller
+Guest --> UC_RelatedProducts
+Guest --> UC_ViewCategory
+Guest --> UC_ProductByCategory
+Guest --> UC_ViewReviews
+Guest --> UC_Register
+
+' User (kế thừa Guest + thêm)
+User --> UC_Login
+User --> UC_AddToCart
+User --> UC_CreateOrder
+User --> UC_ViewMyOrders
+User --> UC_Payment
+User --> UC_CreateReview
+
+' Admin (kế thừa User + thêm)
+Admin --> UC_ManageProducts
+Admin --> UC_ManageCategories
+Admin --> UC_ManageOrders
+Admin --> UC_ManageUsers
+Admin --> UC_ManageTags
+Admin --> UC_UploadImage
+
+' === INCLUDE / EXTEND ===
+UC_CreateOrder ..> UC_AddToCart : <<include>>
+UC_Payment ..> UC_CreateOrder : <<include>>
+UC_ManageProducts ..> UC_UploadImage : <<include>>
+
+@enduml

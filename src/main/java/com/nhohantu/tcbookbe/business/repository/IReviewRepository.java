@@ -13,6 +13,10 @@ import java.util.List;
 @Repository
 public interface IReviewRepository extends JpaRepository<ReviewModel, Long> {
 
+    //Kiểm tra đã tồn tại review cho order và product chưa (Duplicate Check)
+    @Query("SELECT COUNT(r) > 0 FROM ReviewModel r WHERE r.order.id = :orderId AND r.product.id = :productId AND r.isDeleted = false")
+    boolean existsByOrderIdAndProductId(@Param("orderId") Long orderId, @Param("productId") Long productId);
+
     //Tìm tất cả review của một sản phẩm (có phân trang)
     @Query("SELECT r FROM ReviewModel r WHERE r.product.id = :productId AND r.isDeleted = false ORDER BY r.createdAt DESC")
     Page<ReviewModel> findByProductId(@Param("productId") Long productId, Pageable pageable);

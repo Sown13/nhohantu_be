@@ -6,13 +6,19 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Entity
-@Table(name = "reviews")
+@Table(name = "reviews", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"order_id", "product_id"}, name = "uk_review_order_product")
+})
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ReviewModel extends BaseModel {
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)
+    private OrderModel order;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
