@@ -58,7 +58,7 @@ public class PaymentService {
         }
 
         // Update trạng thái
-        order.setStatus(OrderStatus.COMPLETED);
+        order.setStatus(OrderStatus.PENDING);
 //        order.setPaidAt(LocalDateTime.now());
         orderRepository.save(order);
 

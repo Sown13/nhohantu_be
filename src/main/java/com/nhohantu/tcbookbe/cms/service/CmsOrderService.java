@@ -38,14 +38,44 @@ public class CmsOrderService {
 
     // 3. Thêm method update status
     public CmsOrderResponse updateOrderStatus(Long orderId, OrderStatus status) {
+
         OrderModel order = cmsOrderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        order.setStatus(status);
+        boolean validate = canChangeStatus(order.getStatus(), status);
+        if (validate) {
+            order.setStatus(status);
+        }
+        else {
+            throw new RuntimeException("Order status not changed");
+        }
 
         OrderModel updatedOrder = cmsOrderRepository.save(order);
 
         return mapToResponse(updatedOrder);
+    }
+
+    public static boolean canChangeStatus(OrderStatus currentStatus, OrderStatus newStatus) {
+
+        // Nếu đã COMPLETED hoặc CANCELLED thì không được đổi nữa
+        if (currentStatus == OrderStatus.COMPLETED
+                || currentStatus == OrderStatus.CANCELLED) {
+            return false;
+        }
+
+        // Các trường hợp chuyển hợp lệ
+        switch (currentStatus) {
+            case PENDING:
+                return newStatus == OrderStatus.CONFIRMED
+                        || newStatus == OrderStatus.CANCELLED;
+
+            case CONFIRMED:
+                return newStatus == OrderStatus.COMPLETED
+                        || newStatus == OrderStatus.CANCELLED;
+
+            default:
+                return false;
+        }
     }
 
     // ================= MAP FUNCTION =================
