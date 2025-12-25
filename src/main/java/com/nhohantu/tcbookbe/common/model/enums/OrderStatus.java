@@ -4,7 +4,6 @@ package com.nhohantu.tcbookbe.common.model.enums;
 public enum OrderStatus {
     PENDING("Chờ xác nhận"),
     CONFIRMED("Đã xác nhận"),
-    DELIVERED("Đã giao"),
     COMPLETED("Hoàn thành"),
     CANCELLED("Đã hủy");
 

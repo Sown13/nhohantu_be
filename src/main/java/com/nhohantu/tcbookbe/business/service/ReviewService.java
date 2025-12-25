@@ -65,11 +65,11 @@ public class ReviewService {
                 return ResponseBuilder.okResponse("Kiểm tra quyền đánh giá", response, StatusCodeEnum.SUCCESS2000);
             }
 
-            // 3. Lấy danh sách đơn hàng DELIVERED của user có chứa sản phẩm này
+            // 3. Lấy danh sách đơn hàng COMPLETED của user có chứa sản phẩm này
             List<OrderModel> userOrders = orderRepository.findByUserId(currentUser.getId());
 
             List<CanReviewResponse.ReviewableOrderModel> reviewableOrders = userOrders.stream()
-                    .filter(order -> order.getStatus() == OrderStatus.DELIVERED)
+                    .filter(order -> order.getStatus() == OrderStatus.COMPLETED)
                     .filter(order -> order.getOrderDetails().stream()
                             .anyMatch(detail -> detail.getProduct().getId().equals(productId)))
                     .filter(order -> !reviewRepository.existsByOrderIdAndProductId(order.getId(), productId))
@@ -91,13 +91,13 @@ public class ReviewService {
                 if (!hasOrderWithProduct) {
                     reason = "Bạn cần mua sản phẩm này để có thể đánh giá";
                 } else {
-                    boolean hasDeliveredOrder = userOrders.stream()
+                    boolean hasCompletedOrder = userOrders.stream()
                             .filter(order -> order.getOrderDetails().stream()
                                     .anyMatch(detail -> detail.getProduct().getId().equals(productId)))
-                            .anyMatch(order -> order.getStatus() == OrderStatus.DELIVERED);
+                            .anyMatch(order -> order.getStatus() == OrderStatus.COMPLETED);
 
-                    if (!hasDeliveredOrder) {
-                        reason = "Đơn hàng cần được giao thành công để có thể đánh giá";
+                    if (!hasCompletedOrder) {
+                        reason = "Đơn hàng cần hoàn thành để có thể đánh giá";
                     } else {
                         reason = "Bạn đã đánh giá sản phẩm này rồi";
                     }
@@ -150,10 +150,10 @@ public class ReviewService {
                         StatusCodeEnum.EXCEPTION0505);
             }
 
-            // 4. Status Check: Đơn hàng đã ở trạng thái DELIVERED chưa?
-            if (order.getStatus() != OrderStatus.DELIVERED) {
+            // 4. Status Check: Đơn hàng đã ở trạng thái COMPLETED chưa?
+            if (order.getStatus() != OrderStatus.COMPLETED) {
                 return ResponseBuilder.badRequestResponse(
-                        "Chỉ có thể đánh giá sản phẩm khi đơn hàng đã được giao (DELIVERED)",
+                        "Chỉ có thể đánh giá sản phẩm khi đơn hàng đã hoàn thành (COMPLETED)",
                         StatusCodeEnum.ERRORCODE4000);
             }
 

@@ -1,0 +1,59 @@
+@startuml TC_Book_Activity
+
+skinparam backgroundColor white
+skinparam activity {
+    BackgroundColor #E8D5F0
+    BorderColor #9B59B6
+}
+skinparam diamond {
+    BackgroundColor #F5E6CC
+    BorderColor #9B59B6
+}
+
+start
+
+:Browse Products;
+
+:View Product Detail;
+
+if (Add to Cart?) then (yes)
+    :Add to Cart;
+    
+    if (Continue Shopping?) then (yes)
+        :Browse Products;
+    else (no)
+        :View Cart;
+        
+        if (Proceed to Checkout?) then (yes)
+            
+            if (Logged In?) then (yes)
+            else (no)
+                :Login / Register;
+            endif
+            
+            :Enter Shipping Info;
+            
+            :Select Payment Method;
+            
+            :Confirm Order;
+            
+            if (Payment Success?) then (yes)
+                :Order Placed;
+                :Send Confirmation Email;
+            else (no)
+                :Payment Failed;
+                :Retry Payment;
+                stop
+            endif
+            
+        else (no)
+            stop
+        endif
+    endif
+else (no)
+    stop
+endif
+
+stop
+
+@enduml

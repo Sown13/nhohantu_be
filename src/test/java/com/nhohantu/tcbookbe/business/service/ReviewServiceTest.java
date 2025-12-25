@@ -76,7 +76,7 @@ class ReviewServiceTest {
         order = new OrderModel();
         order.setId(1L);
         order.setUser(currentUser);
-        order.setStatus(OrderStatus.DELIVERED);
+        order.setStatus(OrderStatus.COMPLETED);
         order.setOrderDetails(List.of(orderDetail));
 
         // Setup valid request
@@ -144,8 +144,8 @@ class ReviewServiceTest {
     }
 
     @Test
-    @DisplayName("4. Status Check - Đơn hàng chưa DELIVERED (PENDING)")
-    void createReview_WhenOrderNotDelivered_Pending_ShouldReturnError() {
+    @DisplayName("4. Status Check - Đơn hàng chưa COMPLETED (PENDING)")
+    void createReview_WhenOrderNotCompleted_Pending_ShouldReturnError() {
         // Given
         order.setStatus(OrderStatus.PENDING);
 
@@ -158,7 +158,7 @@ class ReviewServiceTest {
         // Then
         assertNotNull(response.getBody());
         assertFalse(response.getBody().isSuccess());
-        assertTrue(response.getBody().getMessage().contains("DELIVERED"));
+        assertTrue(response.getBody().getMessage().contains("COMPLETED"));
     }
 
     @Test
@@ -176,7 +176,7 @@ class ReviewServiceTest {
         // Then
         assertNotNull(response.getBody());
         assertFalse(response.getBody().isSuccess());
-        assertTrue(response.getBody().getMessage().contains("DELIVERED"));
+        assertTrue(response.getBody().getMessage().contains("COMPLETED"));
     }
 
     @Test
