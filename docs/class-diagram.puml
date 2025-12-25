@@ -1,0 +1,36 @@
+@startuml TC_Book_Class_Diagram
+
+skinparam backgroundColor white
+skinparam class {
+    BackgroundColor #E8D5F0
+    BorderColor #9B59B6
+}
+
+class User
+class Product
+class Category
+class Tag
+class Cart
+class CartItem
+class Order
+class OrderDetail
+class Review
+
+User "1" -- "1" Cart
+User "1" -- "*" Order
+
+Cart "1" -- "*" CartItem
+CartItem "*" -- "1" Product
+
+Order "1" -- "*" OrderDetail
+OrderDetail "*" -- "1" Product
+
+Product "*" -- "*" Category
+Product "*" -- "*" Tag
+
+Category "0..1" -- "*" Category : parent
+
+Review "*" -- "1" Product
+Review "*" -- "1" Order
+
+@enduml
